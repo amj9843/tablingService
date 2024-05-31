@@ -83,13 +83,4 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
-    
-    //User 생성자
-    public User(String id, String password, String username, String phoneNumber, List<String> roles) {
-        this.id = id;
-        this.password = password;
-        this.username = username;
-        this.phoneNumber = phoneNumber;
-        this.roles = roles;
-    }
 }
