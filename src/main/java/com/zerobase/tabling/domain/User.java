@@ -35,7 +35,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "user_name")
     //사용자 이름
-    private String name;
+    private String username;
 
     @Column(name = "phone_number")
     //사용자 핸드폰번호
@@ -58,11 +58,6 @@ public class User extends BaseEntity implements UserDetails {
         return this.roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getUsername() {
-        return this.name;
     }
     
     //계정 만료 여부
@@ -90,10 +85,10 @@ public class User extends BaseEntity implements UserDetails {
     }
     
     //User 생성자
-    public User(String id, String password, String name, String phoneNumber, List<String> roles) {
+    public User(String id, String password, String username, String phoneNumber, List<String> roles) {
         this.id = id;
         this.password = password;
-        this.name = name;
+        this.username = username;
         this.phoneNumber = phoneNumber;
         this.roles = roles;
     }
