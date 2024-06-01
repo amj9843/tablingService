@@ -1,5 +1,6 @@
 package com.zerobase.tabling.domain;
 
+import com.zerobase.tabling.domain.type.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,8 +33,9 @@ public class Reservation extends BaseEntity {
     private int headCount;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     //예약 상태
-    private String status;
+    private ReservationStatus status;
 
     @OneToOne(mappedBy = "reservation")
     //일대일 양방향 매핑 연관관계 지정 : 주인
