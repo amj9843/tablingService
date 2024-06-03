@@ -1,16 +1,19 @@
-package com.zerobase.tabling.domain;
+package com.zerobase.tabling.data.domain;
 
-import com.zerobase.tabling.domain.type.UserRole;
+import com.zerobase.tabling.data.domain.constant.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -53,33 +56,46 @@ public class User extends BaseEntity implements UserDetails {
     //다대일 양방향 매핑 연관관계 지정: '일'에 해당
     private List<Reservation> reservations = new ArrayList<>();
 
+    @Builder
+    public User(String id, String password, String username, String phoneNumber, UserRole role) {
+        this.id = id;
+        this.password = password;
+        this.username = username;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+    }
+
+    public void update(String password, String username, String phoneNumber) {
+        this.password = password;
+        this.username = username;
+        this.phoneNumber = phoneNumber;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> collections = new ArrayList<>();
-        collections.add(() -> String.valueOf(this.role));
+        List<String> roles = new ArrayList<>();
+        roles.add(this.role.toString());
 
-        return collections;
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
-    
-    //계정 만료 여부
+
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
-    
-    //계정 잠금 여부
+
     @Override
     public boolean isAccountNonLocked() {
         return false;
     }
-    
-    //비밀번호가 만료 여부
+
     @Override
     public boolean isCredentialsNonExpired() {
         return false;
     }
-    
-    //계정 활성화 상태 여부
+
     @Override
     public boolean isEnabled() {
         return false;

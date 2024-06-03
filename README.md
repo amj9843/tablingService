@@ -3,7 +3,7 @@
 ## Development Environment
 - Intellij IDEA Community
 - Java 17
-- Gradle
+- Gradle 8.7
 - Spring Boot 3.2.5
 
 ## Tech Stack
@@ -21,25 +21,26 @@
   - POST ```/signup```
   - 중복 ID는 허용하지 않음
   - 패스워드는 암호화된 형태로 저장됨
+  - 이름은 20자 이내, 핸드폰번호는 "010-0000-0000" 형식 혹은 "00000000000" 형식, type는 일반 사용자인 "USER" 혹은 매장 관리자 "PARTNER"
   - 입력 파라미터
     ```json
     {
-      "id": String, 
-      "password": String, 
-      "name": String, 
-      "phoneNumber": String, //입력했는데 000-0000-0000 형식이 아닐 경우 오류
-      "type": String //PARTNER(파트너) | USER(일반 사용자) 중 하나 선택
+      "id": "string", 
+      "password": "string", 
+      "name": "string", 
+      "phoneNumber": "string",
+      "type": "string"
     }
     ```
   - 출력 결과
     ```json
     {
       "data": {
-        "userId": Long,
-        "id": String
+        "userId": 0,
+        "id": "string"
       },
-      "code": String,
-      "message": String
+      "code": "string",
+      "message": "string"
     }
     ```
   </details>
@@ -47,42 +48,88 @@
   <summary>로그인 API</summary>
 
     - POST ```/signin```
-    - 로그인 API
     - 회원가입이 되어있고, 아이디/패스워드가 일치하는 경우 JWT 발급
     - 입력 파라미터
       ```json
       {
-        "id": String,
-        "password": String
+        "id": "string",
+        "password": "string"
       }
       ```
     - 출력 결과
       ```json
       {
         "data": {
-          "token": String
+          "token": "string"
         },
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
+      }
+      ```
+  </details>
+  <details>
+  <summary>로그아웃 API</summary>
+
+    - GET ```/signout```
+    - 로그인이 되어있는 경우 로그아웃
+    - 입력 파라미터
+      |key|value|
+      |:---:|:---:|
+      |Authorization|Bearer 로그인 시 발급받은 토큰|
+    - 출력 결과
+      ```json
+      {
+        "data": null,
+        "code": "string",
+        "message": "string"
+      }
+      ```
+  </details>
+  <details>
+  <summary>회원정보 수정 API</summary>
+
+    - PATCH ```/modified```
+    - 현재의 비밀번호(originPassword)를 제외하고선 변경할 값만 입력
+    - 현재 비밀번호 입력값이 등록된 정보와 다를 땐 실행되지 않음
+    - 이름은 20자 이내, 핸드폰번호는 "010-0000-0000" 형식 혹은 "00000000000" 형식
+    - 입력 파라미터
+      ```json
+      {
+        "originPassword": "string",
+        "password": "string",
+        "username": "string",
+        "phoneNumber": "string"
+      }
+      ```
+    - 출력 결과
+      ```json
+      {
+        "data": null,
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
   <details>
   <summary>회원탈퇴 API</summary>
 
-    - DELETE ```/{userId}```
-    - 회원탈퇴 API
-    - 현재 로그인 중인 사용자가 자신의 userId를 알맞게 입력하였을 경우 회원 정보 삭제
+    - DELETE ```/expired```
+    - 현재 로그인 중인 사용자가 자신의 비밀번호를 알맞게 입력하였을 경우 회원 정보 삭제
     - 입력 파라미터
       |key|value|
       |:---:|:---:|
       |Authorization|Bearer 로그인 시 발급받은 토큰|
-      |userId|회원가입 시 받았던 userId|
+      ```json
+      {
+        "password": "string"
+      }
+      ```
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string",
+        "data": null
       }
       ```
   </details>
@@ -96,24 +143,24 @@
       |key|value|
       |:---:|:---:|
       |search|검색할 단어|
-      |orderBy|정렬 기준(NAME: 이름순, RATESCORE: 평점순, RATECOUNT: 리뷰순)|
+      |orderBy|정렬 기준(NAME: 이름순, RATE_HIGH: 평점 높은순, RATE_LOW: 평점 낮은순, REVIEW_COUNT: 리뷰 많은순)|
     - 출력 결과
       ```json
       {
         "data": [
           {
-            "storeId": Long,
-            "storeName": String,
-            "location": String,
-            "description": String,
+            "storeId": 0,
+            "storeName": "string",
+            "location": "string",
+            "description": "string",
             "rate": {
-              "count": Long,
-              "score": Double
+              "count": 0,
+              "score": 0.0
             }
-          }, ...
-        ]
-        "code": String,
-        "message": String
+          }
+        ],
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -130,26 +177,26 @@
       ```json
       {
         "data": {
-          "storeId": Long,
-          "storeName": String,
-          "location": String,
-          "description": String,
+          "storeId": 0,
+          "storeName": "string",
+          "location": "string",
+          "description": "string",
           "rate": {
-            "count": Long,
-            "score": Double
+            "count": 0,
+            "score": 0.0
           },
-          "maxPeopleForTime": Integer,
-          "reservations": {DateTime: Integer, DateTime: Integer, ...}, //매장에서 예약받는 시간대에 예약한 사람 수
+          "maxPeopleForTime": 0,
+          "reservations": {DateTime: 0, DateTime: 0}, //매장에서 예약받는 시간대에 예약한 사람 수
           "reviews": [{
-            "usedDate": String,
-            "createdAt": String,
-            "modifiedAt": String,
-            "rate": Integer,
-            "context": String
-          }, ...]
+            "usedDate": "string",
+            "createdAt": "string",
+            "modifiedAt": "string",
+            "rate": 0,
+            "context": "string"
+          }]
         },
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -162,24 +209,55 @@
     - 입력 파라미터
       |key|value|
       |:---:|:---:|
-      |orderBy|정렬 기준(NAME: 이름순, RATESCORE: 평점순, RATECOUNT: 리뷰순)|
+      |orderBy|정렬 기준(NAME: 이름순, RATE_HIGH: 평점 높은순, RATE_LOW: 평점 낮은순, REVIEW_COUNT: 리뷰 많은순)|
     - 출력 결과
       ```json
       {
         "data": [
           {
-            "storeId": Long,
-            "storeName": String,
-            "location": String,
-            "description": String,
+            "storeId": 0,
+            "storeName": "string",
+            "location": "string",
+            "description": "string",
             "rate": {
-              "count": Long,
-              "score": Double
+              "count": 0,
+              "score": 0.0
             }
-          }, ...
+          }
         ]
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
+      }
+      ```
+  </details>
+  <details>
+  <summary>(파트너용) 매장 목록 확인 API</summary>
+
+    - GET ```/{userId}```
+    - 본인이 등록한 모든 매장 목록을 반환
+    - 본인의 userId 외의 값을 입력한 경우 권한 오류 반환
+    - 반환 결과는 Page 인터페이스 형태로 매장 리스트를 입력한 정렬 기준으로 정렬해 반환(미선택 시 기본 최근 등록순)
+    - 입력 파라미터
+      |key|value|
+      |:---:|:---:|
+      |orderBy|정렬 기준(LATEST: 최근 등록순, EARLIEST: 등록순, NAME: 이름순, RATE_HIGH: 평점 높은순, RATE_LOW: 평점 낮은순, REVIEW_COUNT: 리뷰 많은순)|
+    - 출력 결과
+      ```json
+      {
+        "data": [
+          {
+            "storeId": 0,
+            "storeName": "string",
+            "location": "string",
+            "description": "string",
+            "rate": {
+              "count": 0,
+              "score": 0.0
+            }
+          }
+        ]
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -195,21 +273,21 @@
       |Authorization|Bearer 로그인 시 발급받은 토큰|
       ```json
       {
-        "storeName": String,
-        "location": String,
-        "description": String,
-        "reservationTimes": [String], //"yyyy-mm-dd hh:mm" 형태의 시간 리스트로 작성
-        "maxPeopleForTime": Integer //0 이상으로 작성
+        "storeName": "string",
+        "location": "string",
+        "description": "string",
+        "reservationTimes": ["string"], //"yyyy-mm-dd hh:mm" 형태의 시간 리스트로 작성
+        "maxPeopleForTime": 0 //0 이상으로 작성
       }
       ```
     - 출력 결과
       ```json
       {
         "data": {
-          "storeId": Long
+          "storeId": 0
         },
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -227,8 +305,8 @@
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -245,18 +323,18 @@
       |storeId|예약할 매장의 storeId|
       ```json
       {
-        "reservationDateTime": String,
-        "storeId": Long
-        "numberOfPeople": Integer
+        "reservationDateTime": "string",
+        "storeId": 0
+        "numberOfPeople": 0
       }
       ```
     - 출력 결과
       ```json
       {
-        "reservedId": Long,
-        "code": String,
-        "message": String
-      }, ...]
+        "reservedId": 0,
+        "code": "string",
+        "message": "string"
+      }]
       ```
   </details>
   <details>
@@ -272,16 +350,16 @@
       ```json
       //변경할 내용만 작성
       {
-        "reservationDateTime": String,
-        "numberOfPeople": Integer
+        "reservationDateTime": "string",
+        "numberOfPeople": 0
       }
       ```
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
-      }, ...]
+        "code": "string",
+        "message": "string"
+      }]
       ```
   </details>
   <details>
@@ -297,9 +375,9 @@
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
-      }, ...]
+        "code": "string",
+        "message": "string"
+      }]
       ```
   </details>
   <details>
@@ -315,18 +393,18 @@
       ```json
       {
         "data": [{
-          "reservedId": Long,
-          "createAt": String,
-          "reservationDateTime": String,
-          "storeName": String,
-          "location": String,
-          "description": String
-          "numberOfPeople": Integer,
-          "status": String
+          "reservedId": 0,
+          "createAt": "string",
+          "reservationDateTime": "string",
+          "storeName": "string",
+          "location": "string",
+          "description": "string"
+          "numberOfPeople": 0,
+          "status": "string"
         }
-        "code": String,
-        "message": String
-      }, ...]
+        "code": "string",
+        "message": "string"
+      }]
       ```
   </details>
   <details>
@@ -341,26 +419,26 @@
       |storeId|확인하려는 매장의 storeId|
       ```json
       {
-        "startDate": String,
-        "endDate": String
+        "startDate": "string",
+        "endDate": "string"
       }
       ```
     - 출력 결과
       ```json
       {
         "data": [{
-          "reservedId": Long,
-          "createAt": String,
-          "reservationDateTime": String,
-          "userId": String,
-          "userName": String,
-          "userPhoneNumber": String,
-          "numberOfPeople": Integer,
-          "status": String
+          "reservedId": 0,
+          "createAt": "string",
+          "reservationDateTime": "string",
+          "userId": "string",
+          "userName": "string",
+          "userPhoneNumber": "string",
+          "numberOfPeople": 0,
+          "status": "string"
         }
-        "code": String,
-        "message": String
-      }, ...]
+        "code": "string",
+        "message": "string"
+      }]
       ```
   </details>
   <details>
@@ -381,8 +459,8 @@
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -400,8 +478,8 @@
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -418,18 +496,18 @@
       |reservedId|방문 완료한, 리뷰를 작성하려는 매장의 관련 reservedId|
       ```json
       {
-        "rate": Integer,
-        "context": String
+        "rate": 0,
+        "context": "string"
       }
       ```
     - 출력 결과
       ```json
       {
         "data": {
-          "reviewedId": Long
+          "reviewedId": 0
         },
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -446,15 +524,15 @@
       ```json
       //필요한 변경값만 작성
       {
-        "rate": Integer,
-        "context": String
+        "rate": 0,
+        "context": "string"
       }
       ```
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -471,8 +549,8 @@
     - 출력 결과
       ```json
       {
-        "code": String,
-        "message": String
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>
@@ -485,19 +563,19 @@
     - 입력 파라미터
       |key|value|
       |:---:|:---:|
-      |orderBy|정렬 기준(LATEST: 최근 등록순, EARLIEST: 등록순, RATEGREATER: 평점 높은 순, RATELESS: 평점 낮은 순)|
+      |orderBy|정렬 기준(LATEST: 최근 등록순, EARLIEST: 등록순, RATE_HIGH: 평점 높은 순, RATE_LOW: 평점 낮은 순)|
     - 출력 결과
       ```json
       {
         "data": [{
-          "usedDate": String,
-          "createdAt": String,
-          "modifiedAt": String,
-          "rate": Integer,
-          "context": String
-        }, ...]
-        "code": String,
-        "message": String
+          "usedDate": "string",
+          "createdAt": "string",
+          "modifiedAt": "string",
+          "rate": 0,
+          "context": "string"
+        }]
+        "code": "string",
+        "message": "string"
       }
       ```
   </details>

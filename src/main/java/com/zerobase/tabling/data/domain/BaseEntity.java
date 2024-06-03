@@ -1,4 +1,4 @@
-package com.zerobase.tabling.domain;
+package com.zerobase.tabling.data.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
