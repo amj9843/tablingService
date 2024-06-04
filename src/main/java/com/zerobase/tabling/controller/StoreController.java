@@ -37,7 +37,7 @@ public class StoreController {
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,
                         "매장 등록이 완료되었습니다.",
-                        this.storeService.registStore(user, requests)));
+                        this.storeService.registStore(user.getUserId(), requests)));
     }
 
     //매장 상세정보(예약가능시간 및 인원수) 등록
@@ -50,7 +50,7 @@ public class StoreController {
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,
                         "매장의 상세정보 등록이 완료되었습니다.",
-                        this.storeService.registStoreDetail(user, storeId, requests.getStoreDetails())));
+                        this.storeService.registStoreDetail(user.getUserId(), storeId, requests.getStoreDetails())));
     }
 
     //매장 정보(예약가능시간 및 인원수) 수정

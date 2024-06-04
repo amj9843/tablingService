@@ -1,7 +1,6 @@
 package com.zerobase.tabling.data.dto;
 
 import com.zerobase.tabling.data.domain.Store;
-import com.zerobase.tabling.data.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -22,9 +21,9 @@ public class StoreDto {
         @NotNull
         private String description;
 
-        public Store toEntity(User user){
+        public Store toEntity(Long userId){
             return Store.builder()
-                    .user(user)
+                    .userId(userId)
                     .name(this.name)
                     .location(this.location)
                     .description(this.description)

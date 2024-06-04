@@ -1,7 +1,6 @@
 package com.zerobase.tabling.data.dto;
 
 import com.zerobase.tabling.annotation.ReservationTime;
-import com.zerobase.tabling.data.domain.Store;
 import com.zerobase.tabling.data.domain.StoreDetail;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -35,9 +34,9 @@ public class StoreDetailDto {
         @Min(value = 1, message = "예약 인원 수는 최소 한 명 입니다.")
         private int headCount;
 
-        public StoreDetail toEntity(Store store, LocalDateTime time){
+        public StoreDetail toEntity(Long storeId, LocalDateTime time){
             return StoreDetail.builder()
-                    .store(store)
+                    .storeId(storeId)
                     .reservationTime(time)
                     .headCount(this.headCount)
                     .build();

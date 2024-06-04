@@ -19,10 +19,9 @@ public class Store extends BaseEntity {
     //store 식별번호
     private Long storeId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    //사용자와의 다대일 단방향 매핑 : '다'에 해당, user 식별번호 fk로 가져옴
-    private User user;
+    @Column(name = "user_id")
+    //매장 등록자 식별번호
+    private Long userId;
 
     @Column(name = "store_name")
     //매장명

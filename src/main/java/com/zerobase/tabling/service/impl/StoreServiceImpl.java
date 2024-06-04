@@ -30,29 +30,29 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional
-    public StoreDto.RegistedStoreInfo registStore(User user, StoreDto.RegistRequest request) {
+    public StoreDto.RegistedStoreInfo registStore(Long userId, StoreDto.RegistRequest request) {
         //사용자가 등록한 매장들 중 매장명, 위치가 모두 동일한 매장이 있는지 확인
-        boolean exists = this.storeRepository.existsByUserAndNameAndLocation(user, request.getName(), request.getLocation());
+        boolean exists = this.storeRepository.existsByUserIdAndNameAndLocation(userId, request.getName(), request.getLocation());
         if (exists) {
             throw new AlreadyExistsStoreException();
         }
 
         //DB에 저장
-        Store store = this.storeRepository.save(request.toEntity(user));
+        Store store = this.storeRepository.save(request.toEntity(userId));
 
         //보여줄 값만 빼서 return
-        return new StoreDto.RegistedStoreInfo(user.getUserId(),
+        return new StoreDto.RegistedStoreInfo(userId,
                 store.getStoreId(), store.getName(), store.getLocation(), store.getDescription());
     }
 
     @Override
     @Transactional
-    public StoreDetailDto.RegistedStoreDetails registStoreDetail(User user, Long storeId, List<StoreDetailDto.RegistRequest> requests) {
+    public StoreDetailDto.RegistedStoreDetails registStoreDetail(Long userId, Long storeId, List<StoreDetailDto.RegistRequest> requests) {
         //등록하려는 매장이 있는지 확인
         Store store = this.storeRepository.findByStoreId(storeId).orElseThrow(NoStoreException::new);
 
         //기능을 시행하는 자가 등록하려는 매장의 점장인지 확인
-        if (!Objects.equals(store.getUser().getUserId(), user.getUserId())) {
+        if (!Objects.equals(store.getUserId(), userId)) {
             throw new NoAuthException();
         }
         
@@ -72,19 +72,19 @@ public class StoreServiceImpl implements StoreService {
             //패턴 분석을 위해 String 으로 받은 예약 시간 LocalDateTime 형식으로 전환
             LocalDateTime requestTime = this.timeConverter.stringToLocalDateTime(request.getReservationTime());
 
-            boolean exists = this.storeDetailRepository.existsByStoreAndReservationTime(store, requestTime);
+            boolean exists = this.storeDetailRepository.existsByStoreIdAndReservationTime(storeId, requestTime);
             if (exists) {
                 throw new AlreadyExistsStoreDetailException();
             }
 
-            StoreDetail storeDetail = request.toEntity(store, requestTime);
+            StoreDetail storeDetail = request.toEntity(storeId, requestTime);
             storeDetails.add(storeDetail);
         }
 
         List<StoreDetail> savedStoreDetails = this.storeDetailRepository.saveAll(storeDetails);
 
         return new StoreDetailDto.RegistedStoreDetails(
-                store.getStoreId(),
+                storeId,
                 savedStoreDetails.stream()
                         .map(StoreDetailDto.RegistedStoreDetail::fromEntity)
                         .collect(Collectors.toList())

@@ -1,4 +1,4 @@
-package com.zerobase.tabling.domain;
+package com.zerobase.tabling.data.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,10 +17,9 @@ public class Review extends BaseEntity {
     //review 식별번호
     private Long reviewId;
 
-    @OneToOne
-    @JoinColumn(name = "reservation_id", referencedColumnName = "reservation_id")
-    //일대일 양방향 매핑 연관관계 지정, reservation 식별번호를 fk로 가져옴
-    private Reservation reservation;
+    @Column(name = "reservation_id")
+    //연관된 예약 식별번호
+    private Long reservationId;
 
     @Column(name = "rate")
     //평점
