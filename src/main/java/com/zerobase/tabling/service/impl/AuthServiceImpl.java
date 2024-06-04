@@ -73,18 +73,20 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     }
 
     @Override
-    public void signout(String id) {
+    public void signout(User user) {
         //레디스에 토큰 사용 못하도록 등록
-        redis.setValues(id, "signOutUser", Duration.ofMillis(this.tokenProvider.getAccessTokenExpireTime()));
+        redis.setValues(user.getId(), "signOutUser",
+                Duration.ofMillis(this.tokenProvider.getAccessTokenExpireTime()));
     }
 
     @Override
     @Transactional
-    public void modifiedInfo(Long userId, AuthDto.ModifiedInfoRequest modifiedInfoRequest) {
-        User user = this.userRepository.findByUserId(userId).orElseThrow(NoUserException::new);
+    public void modifiedInfo(User userInfo, AuthDto.ModifiedInfoRequest modifiedInfoRequest) {
+        //업데이트할 유저 객체 호출
+        User user = this.userRepository.findByUserId(userInfo.getUserId()).orElseThrow(NoUserException::new);
         
         //등록된 비밀번호와 입력한 원래 비밀번호가 일치하는지 확인
-        if (!this.passwordEncoder.matches(modifiedInfoRequest.getOriginPassword(), user.getPassword())) {
+        if (!this.passwordEncoder.matches(modifiedInfoRequest.getOriginPassword(), userInfo.getPassword())) {
             throw new IncorrectPasswordException();
         }
         
@@ -102,15 +104,13 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     @Override
     @Transactional
-    public void delete(Long userId, AuthDto.UserPassword password) {
-        User user = this.userRepository.findByUserId(userId).orElseThrow(NoUserException::new);
-
+    public void delete(User user, AuthDto.UserPassword password) {
         //등록된 비밀번호와 입력한 비밀번호가 일치하는지 확인
         if (!this.passwordEncoder.matches(password.getPassword(), user.getPassword())) {
             throw new IncorrectPasswordException();
         }
 
-        this.userRepository.deleteByUserId(userId);
+        this.userRepository.deleteByUserId(user.getUserId());
     }
 
     @Override

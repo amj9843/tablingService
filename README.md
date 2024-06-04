@@ -73,6 +73,7 @@
     - GET ```/signout```
     - 로그인이 되어있는 경우 로그아웃
     - 입력 파라미터
+  
       |key|value|
       |:---:|:---:|
       |Authorization|Bearer 로그인 시 발급받은 토큰|
@@ -89,10 +90,14 @@
   <summary>회원정보 수정 API</summary>
 
     - PATCH ```/modified```
-    - 현재의 비밀번호(originPassword)를 제외하고선 변경할 값만 입력
+    - 현재의 비밀번호(originPassword)를 제외하고선 변경이 없는 항목은 제거
     - 현재 비밀번호 입력값이 등록된 정보와 다를 땐 실행되지 않음
     - 이름은 20자 이내, 핸드폰번호는 "010-0000-0000" 형식 혹은 "00000000000" 형식
     - 입력 파라미터
+
+      |key|value|
+      |:---:|:---:|
+      |Authorization|Bearer 로그인 시 발급받은 토큰|
       ```json
       {
         "originPassword": "string",
@@ -116,6 +121,7 @@
     - DELETE ```/expired```
     - 현재 로그인 중인 사용자가 자신의 비밀번호를 알맞게 입력하였을 경우 회원 정보 삭제
     - 입력 파라미터
+  
       |key|value|
       |:---:|:---:|
       |Authorization|Bearer 로그인 시 발급받은 토큰|
@@ -170,6 +176,7 @@
     - GET ```/details/{storeId}```
     - 매장을 등록할 때 발급받았던 storeId를 입력하였을 경우 매장의 상세 정보 반환
     - 입력 파라미터
+  
       |key|value|
       |:---:|:---:|
       |storeId|상세정보를 확인할 매장의 storeId|

@@ -20,13 +20,13 @@ import java.io.IOException;
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public static final HttpStatus CODE = HttpStatus.UNAUTHORIZED;
-    public static final String MESSAGE = "로그인이 필요합니다.";
+    public static final String MESSAGE = "사용자, 입력값 인증이 되지 않습니다.";
     private final ObjectMapper objectMapper;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-        log.error(MESSAGE, authException);
+        log.error(authException.getMessage(), authException);
 
         String responseBody = objectMapper.writeValueAsString(ResultDto.res(CODE, MESSAGE));
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

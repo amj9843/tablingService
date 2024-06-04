@@ -2,8 +2,18 @@ package com.zerobase.tabling.data.domain.constant;
 
 public enum UserRole {
     //일반 사용자
-    USER,
+    USER("일반 사용자"),
 
     //파트너 사용자
-    PARTNER
+    PARTNER("파트너 사용자");
+
+    private final String description;
+
+    UserRole(String description) {
+        this.description = description;
+    }
+
+    public String description() {
+        return description;
+    }
 }

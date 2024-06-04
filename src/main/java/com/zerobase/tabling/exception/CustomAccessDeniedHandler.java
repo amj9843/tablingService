@@ -20,13 +20,13 @@ import java.io.IOException;
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public static final HttpStatus CODE = HttpStatus.FORBIDDEN;
-    public static final String MESSAGE = "사용 권한이 없습니다.";
+    public static final String MESSAGE = "이용 권한이 없습니다.";
     private final ObjectMapper objectMapper;
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        log.error(MESSAGE, accessDeniedException);
+        log.error(accessDeniedException.getMessage(), accessDeniedException);
 
         String responseBody = objectMapper.writeValueAsString(ResultDto.res(CODE, MESSAGE));
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

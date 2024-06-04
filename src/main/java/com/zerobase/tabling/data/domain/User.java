@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user")
@@ -56,15 +57,6 @@ public class User extends BaseEntity implements UserDetails {
     //다대일 양방향 매핑 연관관계 지정: '일'에 해당
     private List<Reservation> reservations = new ArrayList<>();
 
-    @Builder
-    public User(String id, String password, String username, String phoneNumber, UserRole role) {
-        this.id = id;
-        this.password = password;
-        this.username = username;
-        this.phoneNumber = phoneNumber;
-        this.role = role;
-    }
-
     public void update(String password, String username, String phoneNumber) {
         this.password = password;
         this.username = username;
@@ -74,7 +66,7 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<String> roles = new ArrayList<>();
-        roles.add(this.role.toString());
+        roles.add("ROLE_" + this.role.toString());
 
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
