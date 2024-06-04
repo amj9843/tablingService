@@ -1,6 +1,6 @@
 package com.zerobase.tabling.data.domain;
 
-import com.zerobase.tabling.data.domain.constant.UserRole;
+import com.zerobase.tabling.data.constant.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,14 +48,6 @@ public class User extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     //사용자 권한
     private UserRole role;
-
-    @OneToMany(mappedBy = "user")
-    //다대일 양방향 매핑 연관관계 지정: '일'에 해당
-    private List<Store> stores = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    //다대일 양방향 매핑 연관관계 지정: '일'에 해당
-    private List<Reservation> reservations = new ArrayList<>();
 
     public void update(String password, String username, String phoneNumber) {
         this.password = password;

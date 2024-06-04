@@ -1,7 +1,7 @@
 package com.zerobase.tabling.component;
 
 import com.zerobase.tabling.data.domain.User;
-import com.zerobase.tabling.data.domain.constant.UserRole;
+import com.zerobase.tabling.data.constant.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

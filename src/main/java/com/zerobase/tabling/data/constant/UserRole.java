@@ -1,4 +1,4 @@
-package com.zerobase.tabling.data.domain.constant;
+package com.zerobase.tabling.data.constant;
 
 public enum UserRole {
     //일반 사용자
