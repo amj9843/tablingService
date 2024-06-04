@@ -1,15 +1,14 @@
-package com.zerobase.tabling.domain;
+package com.zerobase.tabling.data.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "store")
@@ -22,7 +21,7 @@ public class Store extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    //사용자와의 다대일 양방향 매핑 : '다'에 해당, user 식별번호 fk로 가져옴
+    //사용자와의 다대일 단방향 매핑 : '다'에 해당, user 식별번호 fk로 가져옴
     private User user;
 
     @Column(name = "store_name")
@@ -36,8 +35,4 @@ public class Store extends BaseEntity {
     @Column(name = "description")
     //매장 설명
     private String description;
-
-    @OneToMany(mappedBy = "store")
-    //예약가능정보와의 다대일 양방향 매핑 연관관계 지정: '일'에 해당
-    private List<StoreDetail> storeDetails = new ArrayList<>();
 }

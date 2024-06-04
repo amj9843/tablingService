@@ -271,10 +271,11 @@
   <details>
   <summary>매장 정보 등록 API</summary>
 
-    - POST ```/regist```
+    - POST ```/registStore```
     - 파트너로 로그인하였고 매장 등록에 필요한 모든 정보가 입력되었을 경우 매장 등록
     - 파트너 회원이 이미 같은 이름, 같은 주소로 등록한 매장이 존재하는 경우 400 status 코드와 에러메세지 반환
     - 입력 파라미터
+  
       |key|value|
       |:---:|:---:|
       |Authorization|Bearer 로그인 시 발급받은 토큰|
@@ -282,9 +283,7 @@
       {
         "storeName": "string",
         "location": "string",
-        "description": "string",
-        "reservationTimes": ["string"], //"yyyy-mm-dd hh:mm" 형태의 시간 리스트로 작성
-        "maxPeopleForTime": 0 //0 이상으로 작성
+        "description": "string"
       }
       ```
     - 출력 결과
@@ -299,11 +298,50 @@
       ```
   </details>
   <details>
+  <summary>매장 상세 정보 등록 API</summary>
+
+    - POST ```/{storeId}/registStoreDetails```
+    - 파트너로 로그인하였고 매장 등록에 필요한 모든 정보가 입력되었을 경우 매장 등록
+    - 파트너 회원이 이미 같은 이름, 같은 주소로 등록한 매장이 존재하는 경우 400 status 코드와 에러메세지 반환
+    - 입력 파라미터
+  
+      |key|value|
+      |:---:|:---:|
+      |Authorization|Bearer 로그인 시 발급받은 토큰|
+      ```json
+      {
+        "storeDetails": [
+          {
+            "reservationTime": "string",
+            "headCount": 0
+          }
+        ]
+      }
+      ```
+    - 출력 결과
+      ```json
+      {
+        "data": {
+          "storeId": 0,
+          "registedStoreDetails": [
+            {
+              "storeDetailId": 0,
+              "reservationTime": "string",
+              "headCount": 0
+            }
+          ]
+        },
+        "code": "string",
+        "message": "string"
+      }
+      ```
+  </details>
+  <details>
   <summary>매장 정보 삭제 API</summary>
 
     - DELETE ```/{storeId}```
     - 매장을 등록했던 파트너가 등록 시 발급받았던 storeId를 입력했을 경우 해당하는 매장 정보 삭제
-    - 진행중인 예약이 없는 경우 동작
+    - 허가를 기다리는 예약, 진행중인 예약이 없는 경우 동작
     - 입력 파라미터
       |key|value|
       |:---:|:---:|
