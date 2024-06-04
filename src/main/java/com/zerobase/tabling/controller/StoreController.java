@@ -31,7 +31,7 @@ public class StoreController {
     //관리자가 매장 등록
     @Operation(summary = "매장 등록")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
-    @PostMapping("/registStore")
+    @PostMapping("/regist/store")
     public ResponseEntity<?> registStore(@AuthenticationPrincipal User user,
                                          @Validated @RequestBody StoreDto.RegistRequest requests) {
         return ResponseEntity.ok(
@@ -43,8 +43,8 @@ public class StoreController {
     //매장 상세정보(예약가능시간 및 인원수) 등록
     @Operation(summary = "매장 상세정보(예약가능시간 및 인원수) 등록")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
-    @PostMapping("/{storeId}/registStoreDetails")
-    public ResponseEntity<?> registStoreDetail(@PathVariable("storeId") Long storeId,
+    @PostMapping("/regist/{storeId}/details")
+    public ResponseEntity<?> registStoreDetails(@PathVariable("storeId") Long storeId,
                                                @AuthenticationPrincipal User user,
                                                @Validated @RequestBody StoreDetailDto.RegistRequests requests) {
         return ResponseEntity.ok(
@@ -56,7 +56,7 @@ public class StoreController {
     //매장 정보(예약가능시간 및 인원수) 수정
     @Operation(summary = "매장 정보(예약가능시간 및 인원수) 수정")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
-    @PatchMapping("/updateStore/{storeId}")
+    @PatchMapping("/update/{storeId}")
     public ResponseEntity<?> updateStore(@PathVariable Long storeId,
                                            @AuthenticationPrincipal User user,
                                            @Validated @RequestBody StoreDto.ModifiedInfoRequest request) {
@@ -68,7 +68,7 @@ public class StoreController {
     //매장 상세정보(예약가능시간 및 인원수) 수정
     @Operation(summary = "매장 상세정보(예약가능시간 및 인원수) 수정")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
-    @PatchMapping("/updateStoreDetail/{storeDetailId}")
+    @PatchMapping("/update/detail/{storeDetailId}")
     public ResponseEntity<?> updateStoreDetail(@PathVariable Long storeDetailId,
                                                  @AuthenticationPrincipal User user,
                                                  @Validated @RequestBody StoreDetailDto.ModifiedInfoRequest request) {
@@ -93,7 +93,7 @@ public class StoreController {
     //관련하여 승인을 기다리는 예약 요청이나 진행중인 예약이 있다면 삭제 불가
     @Operation(summary = "매장 상세정보 삭제(단, 예약상태가 신청 혹은 승인인 예약이 있을 경우 삭제 불가)")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
-    @DeleteMapping("/deleteStoreDetail/{storeDetailId}")
+    @DeleteMapping("/delete/detail/{storeDetailId}")
     public ResponseEntity<?> deleteStoreDetail(@PathVariable Long storeDetailId,
                                                  @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(

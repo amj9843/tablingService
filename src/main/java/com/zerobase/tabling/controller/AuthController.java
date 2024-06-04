@@ -42,8 +42,8 @@ public class AuthController {
      */
     @Operation(summary = "회원가입")
     @PreAuthorize("isAnonymous()") //헤더에 토큰이 없어야 실행 가능
-    @PostMapping("/signup")
-    public ResponseEntity<?> signup(@Validated @RequestBody AuthDto.SignUpRequest signUpRequest) {
+    @PostMapping("/sign/up")
+    public ResponseEntity<?> signUp(@Validated @RequestBody AuthDto.SignUpRequest signUpRequest) {
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,
                         "회원가입이 완료되었습니다.",
@@ -69,8 +69,8 @@ public class AuthController {
      */
     @Operation(summary = "로그인")
     @PreAuthorize("isAnonymous()") //헤더에 토큰이 없어야 실행 가능
-    @PostMapping("/signin")
-    public ResponseEntity<?> signin(@Validated @RequestBody AuthDto.SignInRequest signInRequest) {
+    @PostMapping("/sign/in")
+    public ResponseEntity<?> signIn(@Validated @RequestBody AuthDto.SignInRequest signInRequest) {
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,
                         "로그인이 완료되었습니다.",
@@ -92,8 +92,8 @@ public class AuthController {
      * }
      */
     @Operation(summary = "로그아웃")
-    @GetMapping("/signout")
-    public ResponseEntity<?> signout(@AuthenticationPrincipal User user) {
+    @GetMapping("/sign/out")
+    public ResponseEntity<?> signOut(@AuthenticationPrincipal User user) {
         this.authService.signout(user);
 
         return ResponseEntity.ok(
@@ -124,7 +124,7 @@ public class AuthController {
      * }
      */
     @Operation(summary = "회원정보 수정")
-    @PatchMapping("/modified")
+    @PatchMapping("/modify")
     public ResponseEntity<?> modifiedUserInfo(@AuthenticationPrincipal User user,
                                               @Validated @RequestBody AuthDto.ModifiedInfoRequest modifiedInfoRequest) {
         this.authService.modifiedInfo(user, modifiedInfoRequest);
@@ -154,7 +154,7 @@ public class AuthController {
      * }
      */
     @Operation(summary = "회원 탈퇴")
-    @DeleteMapping("/expired")
+    @DeleteMapping("/expire")
     public ResponseEntity<?> deletedUserInfo(@AuthenticationPrincipal User user,
                                              @Validated @RequestBody AuthDto.UserPassword password) {
         this.authService.delete(user, password);

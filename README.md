@@ -18,7 +18,7 @@
   <details>
   <summary>회원가입 API</summary>
   
-  - POST ```/signup```
+  - POST ```/sign/up```
   - 중복 ID는 허용하지 않음
   - 패스워드는 암호화된 형태로 저장됨
   - 이름은 20자 이내, 핸드폰번호는 "010-0000-0000" 형식 혹은 "00000000000" 형식, type는 일반 사용자인 "USER" 혹은 매장 관리자 "PARTNER"
@@ -47,7 +47,7 @@
   <details>
   <summary>로그인 API</summary>
 
-    - POST ```/signin```
+    - POST ```/sign/in```
     - 회원가입이 되어있고, 아이디/패스워드가 일치하는 경우 JWT 발급
     - 입력 파라미터
       ```json
@@ -70,7 +70,7 @@
   <details>
   <summary>로그아웃 API</summary>
 
-    - GET ```/signout```
+    - GET ```/sign/out```
     - 로그인이 되어있는 경우 로그아웃
     - 입력 파라미터
   
@@ -89,7 +89,7 @@
   <details>
   <summary>회원정보 수정 API</summary>
 
-    - PATCH ```/modified```
+    - PATCH ```/modify```
     - 현재의 비밀번호(originPassword)를 제외하고선 변경이 없는 항목은 제거
     - 현재 비밀번호 입력값이 등록된 정보와 다를 땐 실행되지 않음
     - 이름은 20자 이내, 핸드폰번호는 "010-0000-0000" 형식 혹은 "00000000000" 형식
@@ -118,7 +118,7 @@
   <details>
   <summary>회원탈퇴 API</summary>
 
-    - DELETE ```/expired```
+    - DELETE ```/expire```
     - 현재 로그인 중인 사용자가 자신의 비밀번호를 알맞게 입력하였을 경우 회원 정보 삭제
     - 입력 파라미터
   
@@ -271,7 +271,7 @@
   <details>
   <summary>매장 정보 등록 API</summary>
 
-    - POST ```/registStore```
+    - POST ```/regist/store```
     - 파트너로 로그인하였고 매장 등록에 필요한 모든 정보가 입력되었을 경우 매장 등록
     - 파트너 회원이 이미 같은 이름, 같은 주소로 등록한 매장이 존재하는 경우 400 status 코드와 에러메세지 반환
     - 입력 파라미터
@@ -300,7 +300,7 @@
   <details>
   <summary>매장 상세 정보 등록 API</summary>
 
-    - POST ```/{storeId}/registStoreDetails```
+    - POST ```regist/{storeId}/details```
     - 파트너로 로그인하였고 매장 등록에 필요한 모든 정보가 입력되었을 경우 매장 등록
     - 파트너 회원이 이미 같은 이름, 같은 주소로 등록한 매장이 존재하는 경우 400 status 코드와 에러메세지 반환
     - 입력 파라미터
