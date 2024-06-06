@@ -1,7 +1,7 @@
 package com.zerobase.tabling.annotation.validator;
 
 import com.zerobase.tabling.annotation.PhoneNumber;
-import com.zerobase.tabling.exception.impl.PhoneNumberisNotValid;
+import com.zerobase.tabling.exception.impl.PhoneNumberisNotValidException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -16,6 +16,6 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
             return true; // 01012341234 형식이거나
         }
 
-        throw new PhoneNumberisNotValid();
+        throw new PhoneNumberisNotValidException();
     }
 }

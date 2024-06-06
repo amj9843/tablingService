@@ -1,5 +1,6 @@
 package com.zerobase.tabling.data.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.zerobase.tabling.annotation.ReservationTime;
 import com.zerobase.tabling.data.domain.StoreDetail;
 import jakarta.validation.Valid;
@@ -81,5 +82,26 @@ public class StoreDetailDto {
     public static class ModifiedInfoRequest {
         @Min(value = 1, message = "예약 인원 수는 최소 한 명 입니다.")
         private int headCount;
+    }
+
+    @Data
+    @NoArgsConstructor
+    //StoreDetail 엔티티 값 외로도 가져와야할 정보가 있는 경우 사용
+    public static class CustomStoreDetail {
+        private Long storeDetailId;
+        private Long storeId;
+        private LocalDateTime reservationTime;
+        private int headCount;
+
+        @QueryProjection
+        public CustomStoreDetail(Long storeDetailId,
+                                 Long storeId,
+                                 LocalDateTime reservationTime,
+                                 int headCount) {
+            this.storeDetailId = storeDetailId;
+            this.storeId = storeId;
+            this.reservationTime = reservationTime;
+            this.headCount = headCount;
+        }
     }
 }

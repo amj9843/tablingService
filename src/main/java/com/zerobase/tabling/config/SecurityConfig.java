@@ -26,7 +26,8 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     private static final String[] AUTH_WHITELIST = {
-            "/auth/sign/in", "/auth/sign/up", "/swagger-ui/**", "/swagger-ui-custom.html"
+            "/auth/sign/in", "/auth/sign/up", "/swagger-ui/**", "/swagger-ui-custom.html",
+            "/reservation/kiosk/**"
     };
 
     @Bean

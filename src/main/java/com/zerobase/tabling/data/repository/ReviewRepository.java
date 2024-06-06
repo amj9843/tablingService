@@ -1,6 +1,6 @@
-package com.zerobase.tabling.repository;
+package com.zerobase.tabling.data.repository;
 
-import com.zerobase.tabling.domain.Review;
+import com.zerobase.tabling.data.domain.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

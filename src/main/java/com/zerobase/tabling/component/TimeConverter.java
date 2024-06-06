@@ -1,6 +1,6 @@
 package com.zerobase.tabling.component;
 
-import com.zerobase.tabling.exception.impl.ReservationTimeisNotValid;
+import com.zerobase.tabling.exception.impl.ReservationTimeisNotValidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class TimeConverter {
         try {
             return LocalDateTime.parse(string, formatter);
         } catch (Exception e) {
-            throw new ReservationTimeisNotValid();
+            throw new ReservationTimeisNotValidException();
         }
     }
 }
