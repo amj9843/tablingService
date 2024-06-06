@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -25,6 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    //리뷰 등록
     public ReviewDto.RegistResponse registReview(Long reservationId, Long userId, ReviewDto.RegistRequest request) {
         //이미 작성한 예약이 있는지 확인
         boolean exists = this.reviewRepository.existsByReservationId(reservationId);
@@ -49,6 +52,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    //리뷰 수정
     public void modifyReview(Long reviewId, Long userId, ReviewDto.ModifiedRequest request) {
         //수정하려는 리뷰 호출
         Review review = this.reviewRepository.findByReviewId(reviewId).orElseThrow(NoReviewException::new);
@@ -69,6 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    //리뷰 삭제(유저)
     public void deleteReviewByUser(Long reviewId, Long userId) {
         //삭제하려는 리뷰 호출
         Review review = this.reviewRepository.findByReviewId(reviewId).orElseThrow(NoReviewException::new);
@@ -84,6 +89,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    //리뷰 삭제(파트너)
     public void deleteReviewByPartner(Long reviewId, Long userId) {
         //삭제하려는 리뷰 호출
         Review review = this.reviewRepository.findByReviewId(reviewId).orElseThrow(NoReviewException::new);
@@ -95,5 +101,60 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         this.reviewRepository.delete(review);
+    }
+
+    @Override
+    //매장별 리뷰 조회(최근 등록순)
+    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreLatest(Long storeId) {
+        return this.reviewRepository.reviewListByStoreIdOrderByLatest(storeId);
+    }
+
+    @Override
+    //매장별 리뷰 조회(등록순)
+    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreEarliest(Long storeId) {
+        return this.reviewRepository.reviewListByStoreIdOrderByEarliest(storeId);
+    }
+
+    @Override
+    //매장별 리뷰 조회(평점 높은순/최근 등록순)
+    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreHighRate(Long storeId) {
+        return this.reviewRepository.reviewListByStoreIdOrderByHighRate(storeId);
+    }
+
+    @Override
+    //매장별 리뷰 조회(평점 낮은순/등록순)
+    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreLowRate(Long storeId) {
+        return this.reviewRepository.reviewListByStoreIdOrderByLowRate(storeId);
+    }
+
+    @Override
+    //유저별 리뷰 조회(최근 등록순)
+    public List<ReviewDto.UserReviewInfo> getReviewListByUserLatest(Long userId) {
+        return this.reviewRepository.reviewListByUserIdOrderByLatest(userId);
+    }
+
+    @Override
+    //유저별 리뷰 조회(등록순)
+    public List<ReviewDto.UserReviewInfo> getReviewListByUserEarliest(Long userId) {
+        return this.reviewRepository.reviewListByUserIdOrderByEarliest(userId);
+    }
+
+    @Override
+    //유저별 리뷰 조회(평점 높은순/최근 등록순)
+    public List<ReviewDto.UserReviewInfo> getReviewListByUserHighRate(Long userId) {
+        return this.reviewRepository.reviewListByUserIdOrderByHighRate(userId);
+    }
+
+    @Override
+    //유저별 리뷰 조회(평점 낮은순/최근 등록순)
+    public List<ReviewDto.UserReviewInfo> getReviewListByUserLowRate(Long userId) {
+        return this.reviewRepository.reviewListByUserIdOrderByLowRate(userId);
+    }
+
+    @Override
+    //리뷰 상세정보 조회(예약 정보, 등록자 이름)
+    public ReviewDto.ReviewDetail getReviewDetail(Long reviewId) {
+        return this.reviewRepository.findReviewDetailByReviewId(reviewId)
+                .orElseThrow(NoReviewException::new);
     }
 }

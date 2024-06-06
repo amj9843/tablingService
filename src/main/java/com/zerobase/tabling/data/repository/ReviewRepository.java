@@ -1,13 +1,14 @@
 package com.zerobase.tabling.data.repository;
 
 import com.zerobase.tabling.data.domain.Review;
+import com.zerobase.tabling.data.repository.custom.customRepository.CustomReviewRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, CustomReviewRepository {
     //사용자가 해당 예약에 이미 작성한 리뷰가 있는지 확인
     boolean existsByReservationId(Long reservationId);
 

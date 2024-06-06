@@ -1,5 +1,6 @@
 package com.zerobase.tabling.data.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.zerobase.tabling.data.domain.Review;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -56,28 +57,71 @@ public class ReviewDto {
         private String context;
     }
 
-    //리뷰 조회 응답 DTO
+    //유저별 리뷰 조회 응답 DTO
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
-    public static class ReviewInfo {
+    public static class UserReviewInfo {
         private LocalDateTime createAt;
-        private LocalDateTime modifiedAt;
+        private LocalDateTime updateAt;
+        private Long storeId;
         private Long reviewId;
         private int rate;
         private String context;
+
+        @QueryProjection
+        public UserReviewInfo(LocalDateTime createAt, LocalDateTime updateAt,
+                          Long storeId, Long reviewId, int rate, String context) {
+            this.createAt = createAt;
+            this.updateAt = updateAt;
+            this.storeId = storeId;
+            this.reviewId = reviewId;
+            this.rate = rate;
+            this.context = context;
+        }
+    }
+
+    //상점별 리뷰 조회 응답 DTO
+    @Data
+    @NoArgsConstructor
+    public static class StoreReviewInfo {
+        private LocalDateTime createAt;
+        private LocalDateTime updateAt;
+        private Long reviewId;
+        private int rate;
+        private String context;
+
+        @QueryProjection
+        public StoreReviewInfo(LocalDateTime createAt, LocalDateTime updateAt,
+                               Long reviewId, int rate, String context) {
+            this.createAt = createAt;
+            this.updateAt = updateAt;
+            this.reviewId = reviewId;
+            this.rate = rate;
+            this.context = context;
+        }
     }
 
     //리뷰 상세 조회 응답 DTO
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class ReviewDetail {
         private LocalDateTime createAt;
-        private LocalDateTime modifiedAt;
-        private ReservationDto.ForReview reservation;
+        private LocalDateTime updateAt;
+        private ReservationDto.ForResponse reservation;
         private AuthDto.ForResponse user;
         private int rate;
         private String context;
+
+        @QueryProjection
+        public ReviewDetail(LocalDateTime createAt, LocalDateTime updateAt,
+                            ReservationDto.ForResponse reservation, AuthDto.ForResponse user,
+                            int rate, String context) {
+            this.createAt = createAt;
+            this.updateAt = updateAt;
+            this.reservation = reservation;
+            this.user = user;
+            this.rate = rate;
+            this.context = context;
+        }
     }
 }

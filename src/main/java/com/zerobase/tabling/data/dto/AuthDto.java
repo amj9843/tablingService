@@ -1,5 +1,6 @@
 package com.zerobase.tabling.data.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.zerobase.tabling.annotation.PhoneNumber;
 import com.zerobase.tabling.annotation.ValidEnum;
 import com.zerobase.tabling.data.constant.UserRole;
@@ -113,18 +114,16 @@ public class AuthDto {
 
     //매장 예약 내역 조회, 리뷰 조회 등 다른 조회에서 유저 정보를 보여야할 때 사용될 응답 DTO
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     public static class ForResponse {
-        private Long userId;
-        private String username;
+        private Long id;
+        private String name;
 
-        public ForResponse fromEntity(User user) {
-            return ForResponse.builder()
-                    .userId(user.getUserId())
-                    .username(user.getUsername())
-                    .build();
+        @QueryProjection
+        public ForResponse(Long userId, String username) {
+            this.id = userId;
+            this.name = username;
         }
     }
 }
