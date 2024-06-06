@@ -2,13 +2,14 @@ package com.zerobase.tabling.data.dto;
 
 import com.zerobase.tabling.annotation.PhoneNumber;
 import com.zerobase.tabling.annotation.ValidEnum;
-import com.zerobase.tabling.data.domain.User;
 import com.zerobase.tabling.data.constant.UserRole;
+import com.zerobase.tabling.data.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -108,5 +109,22 @@ public class AuthDto {
 
         @PhoneNumber
         private String phoneNumber;
+    }
+
+    //매장 예약 내역 조회, 리뷰 조회 등 다른 조회에서 유저 정보를 보여야할 때 사용될 응답 DTO
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ForResponse {
+        private Long userId;
+        private String username;
+
+        public ForResponse fromEntity(User user) {
+            return ForResponse.builder()
+                    .userId(user.getUserId())
+                    .username(user.getUsername())
+                    .build();
+        }
     }
 }

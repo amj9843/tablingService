@@ -3,13 +3,12 @@ package com.zerobase.tabling.service.impl;
 import com.zerobase.tabling.component.TimeConverter;
 import com.zerobase.tabling.data.domain.Store;
 import com.zerobase.tabling.data.domain.StoreDetail;
-import com.zerobase.tabling.data.domain.User;
 import com.zerobase.tabling.data.dto.StoreDetailDto;
 import com.zerobase.tabling.data.dto.StoreDto;
 import com.zerobase.tabling.data.repository.StoreDetailRepository;
 import com.zerobase.tabling.data.repository.StoreRepository;
-import com.zerobase.tabling.exception.impl.AlreadyExistsStoreDetailException;
-import com.zerobase.tabling.exception.impl.AlreadyExistsStoreException;
+import com.zerobase.tabling.exception.impl.AlreadyExistStoreDetailException;
+import com.zerobase.tabling.exception.impl.AlreadyExistStoreException;
 import com.zerobase.tabling.exception.impl.NoAuthException;
 import com.zerobase.tabling.exception.impl.NoStoreException;
 import com.zerobase.tabling.service.StoreService;
@@ -34,7 +33,7 @@ public class StoreServiceImpl implements StoreService {
         //사용자가 등록한 매장들 중 매장명, 위치가 모두 동일한 매장이 있는지 확인
         boolean exists = this.storeRepository.existsByUserIdAndNameAndLocation(userId, request.getName(), request.getLocation());
         if (exists) {
-            throw new AlreadyExistsStoreException();
+            throw new AlreadyExistStoreException();
         }
 
         //DB에 저장
@@ -74,7 +73,7 @@ public class StoreServiceImpl implements StoreService {
 
             boolean exists = this.storeDetailRepository.existsByStoreIdAndReservationTime(storeId, requestTime);
             if (exists) {
-                throw new AlreadyExistsStoreDetailException();
+                throw new AlreadyExistStoreDetailException();
             }
 
             StoreDetail storeDetail = request.toEntity(storeId, requestTime);

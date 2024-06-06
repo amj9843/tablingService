@@ -109,6 +109,12 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = this.reservationRepository.findByUserIdAndReservationId(userId, reservationId)
                 .orElseThrow(NoReservationException::new);
 
+        //예약 정보가 취소, 거절 상태인 경우만 삭제 가능
+        if (reservation.getStatus() != ReservationStatus.CANCELED ||
+                reservation.getStatus() != ReservationStatus.DENIED) {
+            throw new NoAuthByStatusException();
+        }
+
         this.reservationRepository.delete(reservation);
     }
 

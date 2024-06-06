@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -54,6 +55,18 @@ public class StoreDto {
         @Null(message = "매장명이 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
         private String name;
         @Null(message = "주소가 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
+        private String location;
+        private String description;
+    }
+
+    //매장 예약 내역 조회, 리뷰 조회 등 다른 조회에서 매장 정보를 보여야할 때 사용될 응답 DTO
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ForResponse {
+        private Long storeId;
+        private String name;
         private String location;
         private String description;
     }

@@ -57,7 +57,7 @@ public class StoreController {
     @Operation(summary = "매장 정보(예약가능시간 및 인원수) 수정")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
     @PatchMapping("/update/{storeId}")
-    public ResponseEntity<?> updateStore(@PathVariable Long storeId,
+    public ResponseEntity<?> updateStore(@PathVariable("storeId") Long storeId,
                                            @AuthenticationPrincipal User user,
                                            @Validated @RequestBody StoreDto.ModifiedInfoRequest request) {
         return ResponseEntity.ok(
@@ -69,7 +69,7 @@ public class StoreController {
     @Operation(summary = "매장 상세정보(예약가능시간 및 인원수) 수정")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
     @PatchMapping("/update/detail/{storeDetailId}")
-    public ResponseEntity<?> updateStoreDetail(@PathVariable Long storeDetailId,
+    public ResponseEntity<?> updateStoreDetail(@PathVariable("storeDetailId") Long storeDetailId,
                                                  @AuthenticationPrincipal User user,
                                                  @Validated @RequestBody StoreDetailDto.ModifiedInfoRequest request) {
         return ResponseEntity.ok(
@@ -82,7 +82,7 @@ public class StoreController {
     @Operation(summary = "매장 삭제(단, 예약상태가 신청 혹은 승인인 예약이 있을 경우 삭제 불가)")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
     @DeleteMapping("/delete/{storeId}")
-    public ResponseEntity<?> deleteStore(@PathVariable Long storeId,
+    public ResponseEntity<?> deleteStore(@PathVariable("storeId") Long storeId,
                                                  @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,
@@ -94,7 +94,7 @@ public class StoreController {
     @Operation(summary = "매장 상세정보 삭제(단, 예약상태가 신청 혹은 승인인 예약이 있을 경우 삭제 불가)")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
     @DeleteMapping("/delete/detail/{storeDetailId}")
-    public ResponseEntity<?> deleteStoreDetail(@PathVariable Long storeDetailId,
+    public ResponseEntity<?> deleteStoreDetail(@PathVariable("storeDetailId") Long storeDetailId,
                                                  @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,

@@ -23,7 +23,7 @@ public class ReservationController {
     @Operation(summary = "예약 신청")
     @PreAuthorize("hasRole('USER')") //유저 권한만 실행 가능
     @PostMapping("/apply/{storeDetailId}")
-    public ResponseEntity<?> applyReservation(@PathVariable Long storeDetailId,
+    public ResponseEntity<?> applyReservation(@PathVariable("storeDetailId") Long storeDetailId,
                                               @AuthenticationPrincipal User user,
                                               @Validated @RequestBody ReservationDto.ApplyRequest request) {
         return ResponseEntity.ok(
@@ -36,7 +36,7 @@ public class ReservationController {
     @Operation(summary = "예약 정보 수정")
     @PreAuthorize("hasRole('USER')") //유저 권한만 실행 가능
     @PatchMapping("/modify/{reservationId}")
-    public ResponseEntity<?> modifyReservation(@PathVariable Long reservationId,
+    public ResponseEntity<?> modifyReservation(@PathVariable("reservationId") Long reservationId,
                                                @AuthenticationPrincipal User user,
                                                @Validated @RequestBody ReservationDto.ModifyRequest request) {
         this.reservationService.modifyReservation(reservationId, user.getUserId(), request);
@@ -50,7 +50,7 @@ public class ReservationController {
     @Operation(summary = "예약 취소")
     @PreAuthorize("hasRole('USER')") //유저 권한만 실행 가능
     @PatchMapping("/cancle/{reservationId}")
-    public ResponseEntity<?> cancleReservation(@PathVariable Long reservationId,
+    public ResponseEntity<?> cancleReservation(@PathVariable("reservationId") Long reservationId,
                                                @AuthenticationPrincipal User user) {
         this.reservationService.cancleReservation(reservationId, user.getUserId());
 
@@ -63,7 +63,7 @@ public class ReservationController {
     @Operation(summary = "예약 취소")
     @PreAuthorize("hasRole('USER')") //유저 권한만 실행 가능
     @DeleteMapping("/delete/{reservationId}")
-    public ResponseEntity<?> deleteReservation(@PathVariable Long reservationId,
+    public ResponseEntity<?> deleteReservation(@PathVariable("reservationId") Long reservationId,
                                                @AuthenticationPrincipal User user) {
         this.reservationService.deleteReservation(reservationId, user.getUserId());
 
@@ -80,7 +80,7 @@ public class ReservationController {
     @Operation(summary = "예약 승인")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
     @PatchMapping("/{reservationId}/approve")
-    public ResponseEntity<?> approveReservation(@PathVariable Long reservationId,
+    public ResponseEntity<?> approveReservation(@PathVariable("reservationId") Long reservationId,
                                                 @AuthenticationPrincipal User user) {
         this.reservationService.denyReservation(reservationId, user.getUserId());
 
@@ -93,7 +93,7 @@ public class ReservationController {
     @Operation(summary = "예약 거절")
     @PreAuthorize("hasRole('PARTNER')") //파트너 권한만 실행 가능
     @PatchMapping("/{reservationId}/deny")
-    public ResponseEntity<?> denyReservation(@PathVariable Long reservationId,
+    public ResponseEntity<?> denyReservation(@PathVariable("reservationId") Long reservationId,
                                              @AuthenticationPrincipal User user) {
         this.reservationService.denyReservation(reservationId, user.getUserId());
 

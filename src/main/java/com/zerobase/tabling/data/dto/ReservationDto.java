@@ -70,4 +70,24 @@ public class ReservationDto {
                     .build();
         }
     }
+
+    //리뷰용 예약 정보 응답 DTO
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ForReview {
+        private Long reservationId;
+        private LocalDateTime time;
+        private int headCount;
+
+        public ForReview fromEntity(Reservation reservation,
+                                          StoreDetailDto.CustomStoreDetail storeDetail) {
+            return ForReview.builder()
+                    .reservationId(reservation.getReservationId())
+                    .time(storeDetail.getReservationTime())
+                    .headCount(reservation.getHeadCount())
+                    .build();
+        }
+    }
 }
