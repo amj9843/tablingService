@@ -13,10 +13,10 @@ import com.zerobase.tabling.exception.impl.NoAuthException;
 import com.zerobase.tabling.exception.impl.NoReviewException;
 import com.zerobase.tabling.service.ReviewService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -104,54 +104,21 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    //매장별 리뷰 조회(최근 등록순)
-    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreLatest(Long storeId) {
-        return this.reviewRepository.reviewListByStoreIdOrderByLatest(storeId);
+    @Transactional
+    //매장별 리뷰 조회(기준: 최근 등록순, 등록순, 평점 높은순, 평점 낮은순)
+    public Page<ReviewDto.StoreReviewInfo> getReviewListByStore(Long storeId, Pageable pageable) {
+        return this.reviewRepository.reviewListByStoreId(storeId, pageable);
     }
 
     @Override
-    //매장별 리뷰 조회(등록순)
-    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreEarliest(Long storeId) {
-        return this.reviewRepository.reviewListByStoreIdOrderByEarliest(storeId);
+    @Transactional
+    //유저별 리뷰 조회(기준: 최근 등록순, 등록순, 평점 높은순, 평점 낮은순)
+    public Page<ReviewDto.UserReviewInfo> getReviewListByUser(Long userId, Pageable pageable) {
+        return this.reviewRepository.reviewListByUserId(userId, pageable);
     }
 
     @Override
-    //매장별 리뷰 조회(평점 높은순/최근 등록순)
-    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreHighRate(Long storeId) {
-        return this.reviewRepository.reviewListByStoreIdOrderByHighRate(storeId);
-    }
-
-    @Override
-    //매장별 리뷰 조회(평점 낮은순/등록순)
-    public List<ReviewDto.StoreReviewInfo> getReviewListByStoreLowRate(Long storeId) {
-        return this.reviewRepository.reviewListByStoreIdOrderByLowRate(storeId);
-    }
-
-    @Override
-    //유저별 리뷰 조회(최근 등록순)
-    public List<ReviewDto.UserReviewInfo> getReviewListByUserLatest(Long userId) {
-        return this.reviewRepository.reviewListByUserIdOrderByLatest(userId);
-    }
-
-    @Override
-    //유저별 리뷰 조회(등록순)
-    public List<ReviewDto.UserReviewInfo> getReviewListByUserEarliest(Long userId) {
-        return this.reviewRepository.reviewListByUserIdOrderByEarliest(userId);
-    }
-
-    @Override
-    //유저별 리뷰 조회(평점 높은순/최근 등록순)
-    public List<ReviewDto.UserReviewInfo> getReviewListByUserHighRate(Long userId) {
-        return this.reviewRepository.reviewListByUserIdOrderByHighRate(userId);
-    }
-
-    @Override
-    //유저별 리뷰 조회(평점 낮은순/최근 등록순)
-    public List<ReviewDto.UserReviewInfo> getReviewListByUserLowRate(Long userId) {
-        return this.reviewRepository.reviewListByUserIdOrderByLowRate(userId);
-    }
-
-    @Override
+    @Transactional
     //리뷰 상세정보 조회(예약 정보, 등록자 이름)
     public ReviewDto.ReviewDetail getReviewDetail(Long reviewId) {
         return this.reviewRepository.findReviewDetailByReviewId(reviewId)

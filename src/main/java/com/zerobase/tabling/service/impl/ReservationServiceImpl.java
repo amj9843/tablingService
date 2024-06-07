@@ -9,10 +9,15 @@ import com.zerobase.tabling.data.repository.StoreDetailRepository;
 import com.zerobase.tabling.exception.impl.*;
 import com.zerobase.tabling.service.ReservationService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -110,12 +115,71 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(NoReservationException::new);
 
         //예약 정보가 취소, 거절 상태인 경우만 삭제 가능
-        if (reservation.getStatus() != ReservationStatus.CANCELED ||
+        if (reservation.getStatus() != ReservationStatus.CANCELED &&
                 reservation.getStatus() != ReservationStatus.DENIED) {
             throw new NoAuthByStatusException();
         }
 
         this.reservationRepository.delete(reservation);
+    }
+
+    @Override
+    @Transactional
+    //사용자의 예약 내역 확인(입력 날짜(미입력시 오늘 기준)에 존재하는 예약 시간 리스트 반환)
+    public Page<ReservationDto.ListForUser> getUserReservation(
+            ReservationStatus status, LocalDate date, Long userId, PageRequest pageRequest) {
+        //예약 내역 불러오기
+        List<ReservationDto.ListForUser> reservationList = (status == null) ?
+                this.reservationRepository.getUserReservationList(date, userId)
+                : this.reservationRepository.getUserReservationList(status, date, userId);
+
+        //List -> Page
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), reservationList.size());
+
+        return new PageImpl<>(reservationList.subList(start, end), pageRequest, reservationList.size());
+    }
+
+    @Override
+    @Transactional
+    //사용자의 예약 상세 확인
+    public ReservationDto.ReservationDetail getReservationDetail(Long reservationId, Long userId) {
+        //사용자가 확인하려는 예약 상세 호출(단, 본인의 예약이 아닐 경우 불러오지 못함)
+        return this.reservationRepository.reservationDetailByReservationIdAndUserId(reservationId, userId)
+                .orElseThrow(NoReservationException::new);
+    }
+
+    @Override
+    @Transactional
+    //관리자의 매장별 예약 내역 확인(입력 날짜(미입력시 오늘 기준)에 존재하는 예약 시간 리스트 반환)
+    public Page<ReservationDto.ListForPartner> getStoreReservation(
+            Long storeId, ReservationStatus status, LocalDate date, Long userId, PageRequest pageRequest) {
+        //예약 내역 불러오기
+        List<ReservationDto.ListForPartner> reservationList = (status == null) ?
+                this.reservationRepository.getPartnerReservationList(storeId, date, userId)
+                : this.reservationRepository.getPartnerReservationList(storeId, status, date, userId);
+
+        //List -> Page
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), reservationList.size());
+
+        return new PageImpl<>(reservationList.subList(start, end), pageRequest, reservationList.size());
+    }
+
+    @Override
+    @Transactional
+    //관리자의 매장별 전체 예약 신청 내역 확인(예약 시간 순)
+    public Page<ReservationDto.ListForPartner> getStoreApplyReservation(
+            Long storeId, Long userId, PageRequest pageRequest) {
+        //예약 내역 불러오기
+        List<ReservationDto.ListForPartner> reservationList =
+                this.reservationRepository.getPartnerApplyReservationList(storeId, userId);
+
+        //List -> Page
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), reservationList.size());
+
+        return new PageImpl<>(reservationList.subList(start, end), pageRequest, reservationList.size());
     }
 
     @Override

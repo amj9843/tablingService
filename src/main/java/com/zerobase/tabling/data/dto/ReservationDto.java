@@ -1,14 +1,13 @@
 package com.zerobase.tabling.data.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.zerobase.tabling.data.constant.ReservationStatus;
 import com.zerobase.tabling.data.domain.Reservation;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class ReservationDto {
     //매장 예약 신청 DTO
@@ -52,7 +51,6 @@ public class ReservationDto {
     //예약 정보 응답 DTO
     @Data
     @Builder
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class ReservationInfo {
         private Long reservationId;
@@ -69,25 +67,105 @@ public class ReservationDto {
                     .status(reservation.getStatus())
                     .build();
         }
+
+        @QueryProjection
+        public ReservationInfo(Long reservationId, LocalDateTime time, int headCount, ReservationStatus status) {
+            this.reservationId = reservationId;
+            this.time = time;
+            this.headCount = headCount;
+            this.status = status;
+        }
+    }
+
+    //예약 상세 정보 응답 DTO
+    @Data
+    @NoArgsConstructor
+    public static class ReservationDetail {
+        private LocalDateTime createdAt;
+        private StoreDto.ForResponse store;
+        private ReservationInfo reservation;
+
+        @QueryProjection
+        public ReservationDetail(LocalDateTime createdAt, StoreDto.ForResponse store, ReservationInfo reservation) {
+            this.createdAt = createdAt;
+            this.store = store;
+            this.reservation = reservation;
+        }
     }
 
     //리뷰용 예약 정보 응답 DTO
     @Data
     @Builder
-    @AllArgsConstructor
     @NoArgsConstructor
-    public static class ForReview {
-        private Long reservationId;
+    public static class ForResponse {
+        private Long id;
         private LocalDateTime time;
         private int headCount;
 
-        public ForReview fromEntity(Reservation reservation,
-                                          StoreDetailDto.CustomStoreDetail storeDetail) {
-            return ForReview.builder()
-                    .reservationId(reservation.getReservationId())
-                    .time(storeDetail.getReservationTime())
-                    .headCount(reservation.getHeadCount())
-                    .build();
+        @QueryProjection
+        public ForResponse(Long reservationId, LocalDateTime time, int headCount) {
+            this.id = reservationId;
+            this.time = time;
+            this.headCount = headCount;
         }
+    }
+
+    //예약시간별 리스트 응답 DTO(유저용)
+    @Data
+    @NoArgsConstructor
+    public static class ListForUser {
+        private LocalDateTime reservationTime;
+        private Set<ForUser> reservationInfo;
+
+        @QueryProjection
+        public ListForUser(LocalDateTime reservationTime, Set<ForUser> reservationInfo) {
+            this.reservationTime = reservationTime;
+            this.reservationInfo = reservationInfo;
+        }
+    }
+
+    //예약시간별 리스트 응답 DTO(파트너용)
+    @Data
+    @NoArgsConstructor
+    public static class ListForPartner {
+        private LocalDateTime reservationTime;
+        private Set<ForPartner> reservationInfo;
+
+        @QueryProjection
+        public ListForPartner(LocalDateTime reservationTime, Set<ForPartner> reservationInfo) {
+            this.reservationTime = reservationTime;
+            this.reservationInfo = reservationInfo;
+        }
+    }
+
+    //파트너의 예약시간별 예약 정보 응답 DTO
+    @Data
+    @NoArgsConstructor
+    @EqualsAndHashCode(of = {"reservationId"})
+    public static class ForPartner {
+        private Long reservationId;
+        private AuthDto.ForResponse user;
+        private int headCount;
+        private ReservationStatus status;
+
+        @QueryProjection
+        public ForPartner(Long reservationId, AuthDto.ForResponse user, int headCount, ReservationStatus status) {
+            this.reservationId = reservationId;
+            this.user = user;
+            this.headCount = headCount;
+            this.status = status;
+        }
+    }
+
+    //유저의 예약시간별 예약 정보 응답 DTO
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode(of = {"reservationId"})
+    public static class ForUser {
+        private Long reservationId;
+        private StoreDto.ForResponse store;
+        private int headCount;
+        private ReservationStatus status;
     }
 }

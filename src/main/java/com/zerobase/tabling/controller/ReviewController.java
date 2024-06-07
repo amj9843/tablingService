@@ -1,5 +1,6 @@
 package com.zerobase.tabling.controller;
 
+import com.zerobase.tabling.data.constant.ReviewSortType;
 import com.zerobase.tabling.data.constant.UserRole;
 import com.zerobase.tabling.data.domain.User;
 import com.zerobase.tabling.data.dto.ResultDto;
@@ -7,6 +8,8 @@ import com.zerobase.tabling.data.dto.ReviewDto;
 import com.zerobase.tabling.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,91 +68,39 @@ public class ReviewController {
                         "리뷰가 삭제되었습니다."));
     }
 
-    //매장별 리뷰 조회(기본: 최근 등록순)
-    @Operation(summary = "매장별 리뷰 조회(기본: 최근 등록순)")
+    //매장별 리뷰 조회(기준: 최근 등록순, 등록순, 평점 높은순, 평점 낮은순)
+    @Operation(summary = "매장별 리뷰 조회(기준: 최근 등록순, 등록순, 평점 높은순, 평점 낮은순)")
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<?> showStoreReview(@PathVariable("storeId") Long storeId) {
+    public ResponseEntity<?> showStoreReview(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(name = "criteria", required = false, defaultValue = "CREATEDATDESC") ReviewSortType criteria,
+            @PathVariable("storeId") Long storeId) {
+
+        Pageable pageable = PageRequest.of(page, size, criteria.sort());
+
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,
-                        "매장의 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByStoreLatest(storeId))
+                        criteria.description() + "으로 매장의 리뷰 목록을 가져왔습니다.",
+                        this.reviewService.getReviewListByStore(storeId, pageable))
         );
     }
 
-    //매장별 리뷰 조회(등록순)
-    @Operation(summary = "매장별 리뷰 조회(등록순)")
-    @GetMapping("/store/{storeId}/earliest")
-    public ResponseEntity<?> showStoreReviewEarliest(@PathVariable("storeId") Long storeId) {
-        return ResponseEntity.ok(
-                ResultDto.res(HttpStatus.OK,
-                        "매장의 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByStoreEarliest(storeId))
-        );
-    }
-
-    //매장별 리뷰 조회(별점 높은순/최근 등록순)
-    @Operation(summary = "매장별 리뷰 조회(별점 높은순/최근 등록순)")
-    @GetMapping("/store/{storeId}/high-rate")
-    public ResponseEntity<?> showStoreReviewHighRate(@PathVariable("storeId") Long storeId) {
-        return ResponseEntity.ok(
-                ResultDto.res(HttpStatus.OK,
-                        "매장의 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByStoreHighRate(storeId))
-        );
-    }
-
-    //매장별 리뷰 조회(별점 낮은순/최근 등록순)
-    @Operation(summary = "매장별 리뷰 조회(별점 낮은순/최근 등록순)")
-    @GetMapping("/store/{storeId}/row-rate")
-    public ResponseEntity<?> showStoreReviewLowRate(@PathVariable("storeId") Long storeId) {
-        return ResponseEntity.ok(
-                ResultDto.res(HttpStatus.OK,
-                        "매장의 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByStoreLowRate(storeId))
-        );
-    }
-
-    //유저가 작성한 리뷰 조회(기본: 최근 등록순)
-    @Operation(summary = "유저가 쓴 리뷰 조회(기본: 최근 등록순)")
+    //유저가 작성한 리뷰 조회(기준: 최근 등록순, 등록순, 평점 높은순, 평점 낮은순)
+    @Operation(summary = "유저가 쓴 리뷰 조회(기준: 최근 등록순, 등록순, 평점 높은순, 평점 낮은순)")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> UserReviewListByLatest(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(
-                ResultDto.res(HttpStatus.OK,
-                        "유저가 작성한 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByUserLatest(userId))
-        );
-    }
+    public ResponseEntity<?> UserReviewListByLatest(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(name = "criteria", required = false, defaultValue = "CREATEDATDESC") ReviewSortType criteria,
+            @PathVariable("userId") Long userId) {
 
-    //유저가 작성한 리뷰 조회
-    @Operation(summary = "유저가 쓴 리뷰 조회(등록순)")
-    @GetMapping("/user/{userId}/earliest")
-    public ResponseEntity<?> UserReviewListByEarliest(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(
-                ResultDto.res(HttpStatus.OK,
-                        "유저가 작성한 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByUserEarliest(userId))
-        );
-    }
+        Pageable pageable = PageRequest.of(page, size, criteria.sort());
 
-    //유저가 작성한 리뷰 조회
-    @Operation(summary = "유저가 쓴 리뷰 조회(별점 높은순/최근 등록순)")
-    @GetMapping("/user/{userId}/high-rate")
-    public ResponseEntity<?> UserReviewListByHighRate(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(
                 ResultDto.res(HttpStatus.OK,
                         "유저가 작성한 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByUserHighRate(userId))
-        );
-    }
-
-    //유저가 작성한 리뷰 조회
-    @Operation(summary = "유저가 쓴 리뷰 조회(별점 낮은순/최근 등록순)")
-    @GetMapping("/user/{userId}/low-rate")
-    public ResponseEntity<?> UserReviewListByLowRate(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(
-                ResultDto.res(HttpStatus.OK,
-                        "유저가 작성한 리뷰 목록을 가져왔습니다.",
-                        this.reviewService.getReviewListByUserLowRate(userId))
+                        this.reviewService.getReviewListByUser(userId, pageable))
         );
     }
 

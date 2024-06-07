@@ -1,5 +1,6 @@
 package com.zerobase.tabling.data.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.zerobase.tabling.data.domain.Store;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -61,7 +62,6 @@ public class StoreDto {
 
     //매장 예약 내역 조회, 리뷰 조회 등 다른 조회에서 매장 정보를 보여야할 때 사용될 응답 DTO
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     public static class ForResponse {
@@ -69,5 +69,13 @@ public class StoreDto {
         private String name;
         private String location;
         private String description;
+
+        @QueryProjection
+        public ForResponse(Long storeId, String name, String location, String description) {
+            this.storeId = storeId;
+            this.name = name;
+            this.location = location;
+            this.description = description;
+        }
     }
 }
