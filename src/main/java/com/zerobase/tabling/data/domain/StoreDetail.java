@@ -32,4 +32,8 @@ public class StoreDetail extends BaseEntity {
     @Column(name = "head_count")
     //시간별 예약가능한 인원
     private int headCount;
+
+    public void update(int headCount) {
+        this.headCount = headCount;
+    }
 }

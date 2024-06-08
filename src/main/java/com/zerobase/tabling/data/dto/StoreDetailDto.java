@@ -6,10 +6,7 @@ import com.zerobase.tabling.data.domain.StoreDetail;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,8 +53,9 @@ public class StoreDetailDto {
     //등록한 상세 정보 DTO
     @Data
     @Builder
-    @AllArgsConstructor
     @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode(of = {"storeDetailId"})
     public static class RegistedStoreDetail {
         private Long storeDetailId;
         private LocalDateTime reservationTime;
@@ -79,14 +77,14 @@ public class StoreDetailDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ModifiedInfoRequest {
+    public static class ModifiedRequest {
         @Min(value = 1, message = "예약 인원 수는 최소 한 명 입니다.")
         private int headCount;
     }
 
     @Data
     @NoArgsConstructor
-    //StoreDetail 엔티티 값 외로도 가져와야할 정보가 있는 경우 사용
+    //예약 신청, 수정 시 유효성 검토용
     public static class CustomStoreDetail {
         private Long storeDetailId;
         private Long storeId;
@@ -102,6 +100,24 @@ public class StoreDetailDto {
             this.storeId = storeId;
             this.reservationTime = reservationTime;
             this.headCount = headCount;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    //예약 상세 내역 조회 시 반환 DTO
+    public static class Detail {
+        private Long storeDetailId;
+        private LocalDateTime reservationTime;
+        private int totalHeadCount;
+        private int nowHeadCount;
+
+        @QueryProjection
+        public Detail(Long storeDetailId, LocalDateTime reservationTime, int totalHeadCount, int nowHeadCount) {
+            this.storeDetailId = storeDetailId;
+            this.reservationTime = reservationTime;
+            this.totalHeadCount = totalHeadCount;
+            this.nowHeadCount = nowHeadCount;
         }
     }
 }

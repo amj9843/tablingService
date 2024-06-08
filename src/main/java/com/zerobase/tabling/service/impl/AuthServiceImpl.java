@@ -2,10 +2,13 @@ package com.zerobase.tabling.service.impl;
 
 import com.zerobase.tabling.component.RedisComponent;
 import com.zerobase.tabling.component.TokenProvider;
+import com.zerobase.tabling.data.constant.UserRole;
 import com.zerobase.tabling.data.domain.User;
 import com.zerobase.tabling.data.dto.AuthDto;
+import com.zerobase.tabling.data.repository.ReservationRepository;
 import com.zerobase.tabling.data.repository.UserRepository;
 import com.zerobase.tabling.exception.impl.AlreadyExistIdException;
+import com.zerobase.tabling.exception.impl.CannotDeleteCauseReservationException;
 import com.zerobase.tabling.exception.impl.IncorrectPasswordException;
 import com.zerobase.tabling.exception.impl.NoUserException;
 import com.zerobase.tabling.service.AuthService;
@@ -25,6 +28,7 @@ import java.time.Duration;
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService, UserDetailsService {
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
     //비밀번호 암호화
     private final PasswordEncoder passwordEncoder;
     //토큰 관련(생성, 정보 가져오기 등)
@@ -108,6 +112,20 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         //등록된 비밀번호와 입력한 비밀번호가 일치하는지 확인
         if (!this.passwordEncoder.matches(password.getPassword(), user.getPassword())) {
             throw new IncorrectPasswordException();
+        }
+
+        //파트너 : 관리중인 매장에서 진행중인 예약이 있는지 없는지
+        //유저 : 예약 상태가 진행중인 예약 내역이 있는지
+        boolean exists = false;
+        if (user.getRole() == UserRole.PARTNER) {
+            exists = this.reservationRepository.existsProgressReservationByPartnerUserId(user.getUserId());
+        } else if (user.getRole() == UserRole.USER) {
+            exists = this.reservationRepository.existsProgressReservationByUserUserId(user.getUserId());
+        }
+
+        //진행중인 내역이 있으면 탈퇴 불가
+        if (exists) {
+            throw new CannotDeleteCauseReservationException();
         }
 
         this.userRepository.deleteByUserId(user.getUserId());

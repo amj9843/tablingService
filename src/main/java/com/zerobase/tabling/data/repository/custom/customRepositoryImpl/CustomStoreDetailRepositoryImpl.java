@@ -9,9 +9,16 @@ import com.zerobase.tabling.data.domain.QStoreDetail;
 import com.zerobase.tabling.data.dto.StoreDetailDto;
 import com.zerobase.tabling.data.repository.custom.customRepository.CustomStoreDetailRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+
+import static com.querydsl.core.group.GroupBy.groupBy;
 
 @Repository
 @RequiredArgsConstructor
@@ -62,5 +69,29 @@ public class CustomStoreDetailRepositoryImpl implements CustomStoreDetailReposit
                 .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    @Override
+    public Page<StoreDetailDto.Detail> getDetailsByStoreId(Long storeId, Pageable pageable, LocalDateTime now) {
+        QStore store = QStore.store;
+        QReservation reservation = QReservation.reservation;
+        QStoreDetail storeDetail = QStoreDetail.storeDetail;
+
+        List<StoreDetailDto.Detail> details = jpaQueryFactory
+                .from(storeDetail)
+                .join(store).on(store.storeId.eq(storeDetail.storeId))
+                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .where(store.storeId.eq(storeId),
+                        storeDetail.reservationTime.after(now),
+                        reservation.status.eq(ReservationStatus.APPROVED)
+                                .or(reservation.status.eq(ReservationStatus.APPLIED)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(storeDetail.reservationTime.asc())
+                .transform(groupBy(storeDetail.storeDetailId).list(Projections.fields(StoreDetailDto.Detail.class,
+                        storeDetail.storeDetailId, storeDetail.reservationTime, storeDetail.headCount, reservation.headCount.sum()
+                )));
+
+        return new PageImpl<>(details, pageable, details.size());
     }
 }

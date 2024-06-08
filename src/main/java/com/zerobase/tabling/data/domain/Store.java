@@ -34,4 +34,10 @@ public class Store extends BaseEntity {
     @Column(name = "description")
     //매장 설명
     private String description;
+
+    public void update(String name, String location, String description) {
+        this.name = name;
+        this.location = location;
+        this.description = description;
+    }
 }

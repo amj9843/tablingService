@@ -136,6 +136,8 @@ public class AuthController {
 
     /**
      * 회원 탈퇴
+     * 파트너의 경우 : 관리중인 매장에 진행중인 예약이 있는 경우 탈퇴 불가
+     * 일반 사용자의 경우 : 진행중인 예약이 있는 경우 탈퇴 불가
      * @param user
      * Headers
      * {

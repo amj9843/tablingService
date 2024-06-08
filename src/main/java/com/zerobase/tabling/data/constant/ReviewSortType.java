@@ -10,7 +10,7 @@ public enum ReviewSortType {
             .and(Sort.by("createdAt").descending())),
 
     RATELOWEST("평점 낮은순", Sort.by("rate").ascending()
-            .and(Sort.by("createdAt").ascending()));
+            .and(Sort.by("createdAt").descending()));
 
     private final String description;
     private final Sort sort;

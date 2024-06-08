@@ -68,6 +68,86 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     }
 
     @Override
+    public boolean existsProgressReservationByStoreId(Long storeId) {
+        QStore store = QStore.store;
+        QStoreDetail storeDetail = QStoreDetail.storeDetail;
+        QReservation reservation = QReservation.reservation;
+
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(reservation)
+                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
+                .join(store).on(store.storeId.eq(storeDetail.storeId))
+                .where(
+                        store.storeId.eq(storeId),
+                        reservation.status.eq(ReservationStatus.APPLIED)
+                                .or(reservation.status.eq(ReservationStatus.APPROVED))
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    @Override
+    public boolean existsProgressReservationByStoreDetailId(Long storeDetailId) {
+        QStoreDetail storeDetail = QStoreDetail.storeDetail;
+        QReservation reservation = QReservation.reservation;
+
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(reservation)
+                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
+                .where(
+                        storeDetail.storeDetailId.eq(storeDetailId),
+                        reservation.status.eq(ReservationStatus.APPLIED)
+                                .or(reservation.status.eq(ReservationStatus.APPROVED))
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    @Override
+    public boolean existsProgressReservationByPartnerUserId(Long userId) {
+        QUser user = QUser.user;
+        QStore store = QStore.store;
+        QStoreDetail storeDetail = QStoreDetail.storeDetail;
+        QReservation reservation = QReservation.reservation;
+
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(reservation)
+                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
+                .join(store).on(store.storeId.eq(storeDetail.storeId))
+                .join(user).on(user.userId.eq(store.userId))
+                .where(
+                        user.userId.eq(userId),
+                        reservation.status.eq(ReservationStatus.APPLIED)
+                                .or(reservation.status.eq(ReservationStatus.APPROVED))
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    @Override
+    public boolean existsProgressReservationByUserUserId(Long userId) {
+        QReservation reservation = QReservation.reservation;
+
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(reservation)
+                .where(
+                        reservation.userId.eq(userId),
+                        reservation.status.eq(ReservationStatus.APPLIED)
+                                .or(reservation.status.eq(ReservationStatus.APPROVED))
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    @Override
     public Optional<ReservationDto.ReservationDetail> reservationDetailByReservationIdAndUserId(Long reservationId, Long userId) {
         QReservation reservation = QReservation.reservation;
         QStoreDetail storeDetail = QStoreDetail.storeDetail;
@@ -270,5 +350,20 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         return resultMap.keySet().stream()
                 .map(resultMap::get)
                 .collect(toList());
+    }
+
+    @Override
+    public int countHeadCountByStoreDetailId(Long storeDetailId) {
+        QReservation reservation = QReservation.reservation;
+
+        return jpaQueryFactory
+                .select(reservation.headCount.sum())
+                .from(reservation)
+                .where(
+                        reservation.storeDetailId.eq(storeDetailId),
+                        reservation.status.eq(ReservationStatus.APPLIED)
+                                .or(reservation.status.eq(ReservationStatus.APPROVED))
+                )
+                .fetchFirst();
     }
 }

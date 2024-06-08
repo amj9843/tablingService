@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 public class StoreDto {
     //매장등록 요청 DTO
@@ -52,7 +53,7 @@ public class StoreDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ModifiedInfoRequest {
+    public static class ModifiedRequest {
         @Null(message = "매장명이 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
         private String name;
         @Null(message = "주소가 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
@@ -76,6 +77,56 @@ public class StoreDto {
             this.name = name;
             this.location = location;
             this.description = description;
+        }
+    }
+
+    //매장 목록 조회 시 DTO
+    @Data
+    @NoArgsConstructor
+    public static class StoreInfo {
+        private Long storeId;
+        private String name;
+        private String location;
+        private String description;
+        private Double rate;
+        private Long reviewCount;
+
+        @QueryProjection
+        public StoreInfo(Long storeId, String name, String location, String description,
+                         Double rate, Long reviewCount) {
+            this.storeId = storeId;
+            this.name = name;
+            this.location = location;
+            this.description = description;
+            this.rate = rate;
+            this.reviewCount = reviewCount;
+        }
+    }
+
+    //매장 상세 DTO
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Detail {
+        private Long storeId;
+        private String name;
+        private String location;
+        private String description;
+        private Double rate;
+        private Long reviewCount;
+        private Page<StoreDetailDto.Detail> details;
+
+        public static Detail toDetail(StoreInfo storeInfo, Page<StoreDetailDto.Detail> details) {
+            return Detail.builder()
+                    .storeId(storeInfo.getStoreId())
+                    .name(storeInfo.getName())
+                    .location(storeInfo.getLocation())
+                    .description(storeInfo.getDescription())
+                    .rate(storeInfo.getRate())
+                    .reviewCount(storeInfo.getReviewCount())
+                    .details(details)
+                    .build();
         }
     }
 }
