@@ -32,9 +32,12 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional
-    public Page<StoreDto.StoreInfo> getStoreList(PageRequest pageRequest) {
+    public Page<StoreDto.StoreInfo> getStoreList(PageRequest pageRequest,
+                                                 Comparator<StoreDto.StoreInfo> comparator) {
         //리스트로 전체 목록 받아오기
         List<StoreDto.StoreInfo> storeList = this.storeRepository.getStoreList();
+        //리스트 정렬하기
+        storeList.sort(comparator);
 
         //페이지화하기
         int start = (int) pageRequest.getOffset();
@@ -44,9 +47,12 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional
-    public Page<StoreDto.StoreInfo> getStoreList(PageRequest pageRequest, String word) {
+    public Page<StoreDto.StoreInfo> getStoreList(PageRequest pageRequest, String word,
+                                                 Comparator<StoreDto.StoreInfo> comparator) {
         //리스트로 검색하기
         List<StoreDto.StoreInfo> storeList = this.storeRepository.getStoreList(word);
+        //리스트 정렬하기
+        storeList.sort(comparator);
 
         //페이지화하기
         int start = (int) pageRequest.getOffset();
@@ -56,9 +62,12 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional
-    public Page<StoreDto.StoreInfo> getAllStoreListByPartner(Long userId, PageRequest pageRequest) {
+    public Page<StoreDto.StoreInfo> getAllStoreListByPartner(Long userId, PageRequest pageRequest,
+                                                             Comparator<StoreDto.StoreInfo> comparator) {
         //리스트로 자신이 관리하는 매장만 가져오기
         List<StoreDto.StoreInfo> storeList = this.storeRepository.getStoreListByPartner(userId);
+        //리스트 정렬하기
+        storeList.sort(comparator);
 
         //페이지화하기
         int start = (int) pageRequest.getOffset();

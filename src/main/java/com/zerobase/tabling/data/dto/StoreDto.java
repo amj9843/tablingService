@@ -1,10 +1,10 @@
 package com.zerobase.tabling.data.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.zerobase.tabling.annotation.NullOrNot;
 import com.zerobase.tabling.data.domain.Store;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,9 +54,9 @@ public class StoreDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ModifiedRequest {
-        @Null(message = "매장명이 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
+        @NullOrNot(message = "매장명이 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
         private String name;
-        @Null(message = "주소가 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
+        @NullOrNot(message = "주소가 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
         private String location;
         private String description;
     }

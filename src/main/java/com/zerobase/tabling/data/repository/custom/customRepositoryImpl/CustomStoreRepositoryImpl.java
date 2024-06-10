@@ -14,8 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
-
 @Repository
 @RequiredArgsConstructor
 public class CustomStoreRepositoryImpl implements CustomStoreRepository {
@@ -30,11 +28,11 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         Integer fetchOne = jpaQueryFactory
                 .selectOne()
                 .from(reservation)
-                .join(storeDetail)
+                .leftJoin(storeDetail)
                 .on(
                         reservation.storeDetailId.eq(storeDetail.storeDetailId)
                 )
-                .join(store)
+                .leftJoin(store)
                 .on(
                         storeDetail.storeId.eq(store.storeId)
                 )
@@ -55,18 +53,19 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         QReview review = QReview.review;
 
         return jpaQueryFactory
-                .from(store)
-                .join(storeDetail).on(storeDetail.storeId.eq(store.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
-                .join(review).on(review.reservationId.eq(reservation.reservationId))
-                .transform(groupBy(store.storeId).list(Projections.fields(StoreDto.StoreInfo.class,
+                .select(Projections.fields(StoreDto.StoreInfo.class,
                         store.storeId,
                         store.name,
                         store.location,
                         store.description,
-                        review.rate.avg(),
-                        review.count()
-                )));
+                        review.rate.avg().coalesce(0.0).as("rate"),
+                        review.count().coalesce(0L).as("reviewCount")))
+                .from(store)
+                .leftJoin(storeDetail).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .leftJoin(review).on(review.reservationId.eq(reservation.reservationId))
+                .groupBy(store.storeId)
+                .fetch();
     }
 
     @Override
@@ -77,19 +76,20 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         QReview review = QReview.review;
 
         return jpaQueryFactory
-                .from(store)
-                .join(storeDetail).on(storeDetail.storeId.eq(store.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
-                .join(review).on(review.reservationId.eq(reservation.reservationId))
-                .where(store.name.contains(word).or(store.location.contains(word)).or(store.description.contains(word)))
-                .transform(groupBy(store.storeId).list(Projections.fields(StoreDto.StoreInfo.class,
+                .select(Projections.fields(StoreDto.StoreInfo.class,
                         store.storeId,
                         store.name,
                         store.location,
                         store.description,
-                        review.rate.avg(),
-                        review.count()
-                )));
+                        review.rate.avg().coalesce(0.0).as("rate"),
+                        review.count().coalesce(0L).as("reviewCount")))
+                .from(store)
+                .leftJoin(storeDetail).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .leftJoin(review).on(review.reservationId.eq(reservation.reservationId))
+                .where(store.name.contains(word).or(store.location.contains(word)).or(store.description.contains(word)))
+                .groupBy(store.storeId)
+                .fetch();
     }
 
     @Override
@@ -100,19 +100,20 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         QReview review = QReview.review;
 
         return jpaQueryFactory
-                .from(store)
-                .join(storeDetail).on(storeDetail.storeId.eq(store.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
-                .join(review).on(review.reservationId.eq(reservation.reservationId))
-                .where(store.userId.eq(userId))
-                .transform(groupBy(store.storeId).list(Projections.fields(StoreDto.StoreInfo.class,
+                .select(Projections.fields(StoreDto.StoreInfo.class,
                         store.storeId,
                         store.name,
                         store.location,
                         store.description,
-                        review.rate.avg(),
-                        review.count()
-                )));
+                        review.rate.avg().coalesce(0.0).as("rate"),
+                        review.count().coalesce(0L).as("reviewCount")))
+                .from(store)
+                .leftJoin(storeDetail).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .leftJoin(review).on(review.reservationId.eq(reservation.reservationId))
+                .where(store.userId.eq(userId))
+                .groupBy(store.storeId)
+                .fetch();
     }
 
     @Override
@@ -128,14 +129,14 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
                         store.name,
                         store.location,
                         store.description,
-                        review.rate.avg(),
-                        review.count()
-                ))
+                        review.rate.avg().coalesce(0.0).as("rate"),
+                        review.count().coalesce(0L).as("reviewCount")))
                 .from(store)
-                .join(storeDetail).on(storeDetail.storeId.eq(store.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(reservation.reservationId))
-                .join(review).on(review.reservationId.eq(reservation.reservationId))
+                .leftJoin(storeDetail).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.storeDetailId.eq(reservation.reservationId))
+                .leftJoin(review).on(review.reservationId.eq(reservation.reservationId))
                 .where(store.storeId.eq(storeId))
+                .groupBy(store.storeId)
                 .fetchOne());
     }
 }

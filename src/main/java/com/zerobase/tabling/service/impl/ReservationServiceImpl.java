@@ -39,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
         
         //DB에 저장
-        Reservation reservation = this.reservationRepository.save(request.toEntity(userId));
+        Reservation reservation = this.reservationRepository.save(request.toEntity(userId, storeDetailId));
 
         //보여줄 값만 빼서 return
         return new ReservationDto.ReservationInfo().fromEntity(reservation, storeDetail);
@@ -61,14 +61,14 @@ public class ReservationServiceImpl implements ReservationService {
         //인원수를 바꾸려 한다면 새로운 인원 수를 값으로 가져옴
         int headCount = (request.getHeadCount() > 0) ? request.getHeadCount() : reservation.getHeadCount();
         //예약하려는 storeId를 바꾸려 한다면 새로운 storeDetailId를 가져옴
-        Long storeDetailId = (request.getStoreDetailId() > 0) ?
+        Long storeDetailId = (request.getStoreDetailId() != null && request.getStoreDetailId() > 0) ?
                 request.getStoreDetailId() : reservation.getReservationId();
 
         //예약 가능 인원수 확보
         int canReservedHeadCount = reservation.getHeadCount();
 
         //시간을 바꾸려 한다면 새로운 예약 신청과 동일한 조건 클리어해야함
-        if (request.getStoreDetailId() > 0) {
+        if (request.getStoreDetailId() != null && request.getStoreDetailId() > 0) {
             //사용자가 예약하려는 storeDetail 검토
             StoreDetailDto.CustomStoreDetail storeDetail = this.validStoreDetail(userId, request.getStoreDetailId());
             canReservedHeadCount = storeDetail.getHeadCount();
@@ -91,14 +91,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     //예약 취소
-    public void cancleReservation(Long reservationId, Long userId) {
+    public void cancelReservation(Long reservationId, Long userId) {
         //사용자가 취소하려는 예약 정보의 상태가 신청 혹은 승인인지 확인
         Reservation reservation = this.reservationRepository.findByUserIdAndReservationId(userId, reservationId)
                 .orElseThrow(NoReservationException::new);
 
-        //예약 상태가 신청 혹은 승인 상태일 경우만 수정 가능
-        if (reservation.getStatus() != ReservationStatus.APPLIED &&
-                reservation.getStatus() != ReservationStatus.APPROVED) {
+        //방문 완료 상태가 아닌 예약만 취소 가능
+        if (reservation.getStatus() == ReservationStatus.COMPLETED) {
             throw new NoAuthByStatusException();
         }
 
@@ -196,7 +195,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         //예약상태가 신청 상태가 아니거나 자신이 관리하는 매장의 예약 정보가 아닌 경우 권한 없음 출력
         if (reservation.getStatus() != ReservationStatus.APPLIED
-                && !storeOwner) throw new NoAuthException();
+                || !storeOwner) throw new NoAuthException();
 
         //상태 업데이트
         reservation.update(ReservationStatus.APPROVED);
@@ -216,7 +215,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         //예약상태가 신청 상태가 아니거나 자신이 관리하는 매장의 예약 정보가 아닌 경우 권한 없음 출력
         if (reservation.getStatus() != ReservationStatus.APPLIED
-                && !storeOwner) throw new NoAuthException();
+                || !storeOwner) throw new NoAuthException();
 
         //상태 업데이트
         reservation.update(ReservationStatus.DENIED);

@@ -1,13 +1,13 @@
 package com.zerobase.tabling.data.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.zerobase.tabling.annotation.NullOrNot;
 import com.zerobase.tabling.annotation.PhoneNumber;
 import com.zerobase.tabling.annotation.ValidEnum;
 import com.zerobase.tabling.data.constant.UserRole;
 import com.zerobase.tabling.data.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -101,10 +101,10 @@ public class AuthDto {
         @NotBlank(message = "기존 비밀번호 입력은 필수이며 빈 칸, 공백으로만 구성되는 것은 허용하지 않습니다.")
         private String originPassword;
 
-        @Null
+        @NullOrNot
         private String password;
 
-        @Null
+        @NullOrNot
         @Size(max = 20)
         private String username;
 

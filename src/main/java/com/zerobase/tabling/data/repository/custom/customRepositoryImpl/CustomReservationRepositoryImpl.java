@@ -53,14 +53,14 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         Integer fetchOne = jpaQueryFactory
                 .selectOne()
                 .from(reservation)
-                .join(storeDetail)
+                .leftJoin(storeDetail)
                 .on(
                         reservation.storeDetailId.eq(storeDetail.storeDetailId)
                 )
                 .where(
                         reservation.reservationId.eq(reservationId),
                         reservation.status.eq(ReservationStatus.APPROVED),
-                        storeDetail.reservationTime.between(now.minusMinutes(30), now.minusMinutes(10))
+                        storeDetail.reservationTime.between(now.plusMinutes(10), now.plusMinutes(30))
                 )
                 .fetchFirst();
 
@@ -76,8 +76,8 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         Integer fetchOne = jpaQueryFactory
                 .selectOne()
                 .from(reservation)
-                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
-                .join(store).on(store.storeId.eq(storeDetail.storeId))
+                .leftJoin(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
+                .leftJoin(store).on(store.storeId.eq(storeDetail.storeId))
                 .where(
                         store.storeId.eq(storeId),
                         reservation.status.eq(ReservationStatus.APPLIED)
@@ -96,7 +96,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         Integer fetchOne = jpaQueryFactory
                 .selectOne()
                 .from(reservation)
-                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
+                .leftJoin(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
                 .where(
                         storeDetail.storeDetailId.eq(storeDetailId),
                         reservation.status.eq(ReservationStatus.APPLIED)
@@ -117,9 +117,9 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         Integer fetchOne = jpaQueryFactory
                 .selectOne()
                 .from(reservation)
-                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
-                .join(store).on(store.storeId.eq(storeDetail.storeId))
-                .join(user).on(user.userId.eq(store.userId))
+                .leftJoin(storeDetail).on(storeDetail.storeDetailId.eq(reservation.reservationId))
+                .leftJoin(store).on(store.storeId.eq(storeDetail.storeId))
+                .leftJoin(user).on(user.userId.eq(store.userId))
                 .where(
                         user.userId.eq(userId),
                         reservation.status.eq(ReservationStatus.APPLIED)
@@ -157,15 +157,16 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         return Optional.ofNullable(jpaQueryFactory
                 .select(Projections.fields(ReservationDto.ReservationDetail.class,
                         reservation.createdAt,
-                        Projections.fields(StoreDto.ForResponse.class,
-                                store.storeId, store.name, store.location, store.description),
-                        Projections.fields(ReservationDto.ReservationInfo.class,
-                                reservation.reservationId, storeDetail.reservationTime, reservation.headCount, reservation.status)
+                        new QStoreDto_ForResponse(
+                                store.storeId, store.name, store.location, store.description).as("store"),
+                        new QReservationDto_ReservationInfo(
+                                reservation.reservationId, storeDetail.reservationTime,
+                                reservation.headCount, reservation.status).as("reservation")
                 ))
                 .from(reservation)
-                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.storeDetailId))
-                .join(store).on(store.storeId.eq(storeDetail.storeId))
-                .join(user).on(user.userId.eq(reservation.userId))
+                .leftJoin(storeDetail).on(storeDetail.storeDetailId.eq(reservation.storeDetailId))
+                .leftJoin(store).on(store.storeId.eq(storeDetail.storeId))
+                .leftJoin(user).on(user.userId.eq(reservation.userId))
                 .where(reservation.reservationId.eq(reservationId),
                         user.userId.eq(userId))
                 .fetchOne());
@@ -180,9 +181,9 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
 
         Map<Long, ReservationDto.ListForUser> resultMap = jpaQueryFactory
                 .from(user)
-                .join(reservation).on(reservation.userId.eq(user.userId))
-                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.storeDetailId))
-                .join(store).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.userId.eq(user.userId))
+                .leftJoin(storeDetail).on(storeDetail.storeDetailId.eq(reservation.storeDetailId))
+                .leftJoin(store).on(storeDetail.storeId.eq(store.storeId))
                 .where(
                         user.userId.eq(userId),
                         storeDetail.reservationTime.between(
@@ -214,9 +215,9 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
 
         Map<Long, ReservationDto.ListForUser> resultMap = jpaQueryFactory
                 .from(user)
-                .join(reservation).on(reservation.userId.eq(user.userId))
-                .join(storeDetail).on(storeDetail.storeDetailId.eq(reservation.storeDetailId))
-                .join(store).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.userId.eq(user.userId))
+                .leftJoin(storeDetail).on(storeDetail.storeDetailId.eq(reservation.storeDetailId))
+                .leftJoin(store).on(storeDetail.storeId.eq(store.storeId))
                 .where(
                         user.userId.eq(userId),
                         storeDetail.reservationTime.between(
@@ -246,15 +247,15 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         QReservation reservation = QReservation.reservation;
         QStoreDetail storeDetail = QStoreDetail.storeDetail;
         QStore store = QStore.store;
-        QUser storeOwner = QUser.user;
-        QUser user = QUser.user;
+        QUser storeOwner = new QUser("storeOwner");
+        QUser customer = new QUser("customer");
 
         Map<Long, ReservationDto.ListForPartner> resultMap = jpaQueryFactory
                 .from(storeOwner)
-                .join(store).on(store.userId.eq(storeOwner.userId))
-                .join(storeDetail).on(storeDetail.storeId.eq(store.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
-                .join(user).on(reservation.userId.eq(user.userId))
+                .leftJoin(store).on(store.userId.eq(storeOwner.userId))
+                .leftJoin(storeDetail).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .leftJoin(customer).on(reservation.userId.eq(customer.userId))
                 .where(
                         store.storeId.eq(storeId),
                         store.userId.eq(userId),
@@ -268,7 +269,8 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                         set(new QReservationDto_ForPartner(
                                 reservation.reservationId,
                                 Projections.fields(AuthDto.ForResponse.class,
-                                        user.userId, user.username),
+                                        customer.userId.as("id"),
+                                        customer.username.as("name")),
                                 reservation.headCount, reservation.status)
                         ))
                 ));
@@ -279,19 +281,20 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     }
 
     @Override
-    public List<ReservationDto.ListForPartner> getPartnerReservationList(Long storeId, ReservationStatus status, LocalDate date, Long userId) {
+    public List<ReservationDto.ListForPartner> getPartnerReservationList(
+            Long storeId, ReservationStatus status, LocalDate date, Long userId) {
         QReservation reservation = QReservation.reservation;
         QStoreDetail storeDetail = QStoreDetail.storeDetail;
         QStore store = QStore.store;
-        QUser storeOwner = QUser.user;
-        QUser user = QUser.user;
+        QUser storeOwner = new QUser("storeOwner");
+        QUser customer = new QUser("customer");
 
         Map<Long, ReservationDto.ListForPartner> resultMap = jpaQueryFactory
                 .from(storeOwner)
-                .join(store).on(store.userId.eq(storeOwner.userId))
-                .join(storeDetail).on(storeDetail.storeId.eq(store.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
-                .join(user).on(reservation.userId.eq(user.userId))
+                .leftJoin(store).on(store.userId.eq(storeOwner.userId))
+                .leftJoin(storeDetail).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .leftJoin(customer).on(reservation.userId.eq(customer.userId))
                 .where(
                         store.storeId.eq(storeId),
                         store.userId.eq(userId),
@@ -307,7 +310,8 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                         set(new QReservationDto_ForPartner(
                                 reservation.reservationId,
                                 Projections.fields(AuthDto.ForResponse.class,
-                                        user.userId, user.username),
+                                        customer.userId.as("id"),
+                                        customer.username.as("name")),
                                 reservation.headCount, reservation.status)
                         ))
                 ));
@@ -322,15 +326,15 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         QReservation reservation = QReservation.reservation;
         QStoreDetail storeDetail = QStoreDetail.storeDetail;
         QStore store = QStore.store;
-        QUser storeOwner = QUser.user;
-        QUser user = QUser.user;
+        QUser storeOwner = new QUser("storeOwner");
+        QUser customer = new QUser("customer");
 
         Map<Long, ReservationDto.ListForPartner> resultMap = jpaQueryFactory
                 .from(storeOwner)
-                .join(store).on(store.userId.eq(storeOwner.userId))
-                .join(storeDetail).on(storeDetail.storeId.eq(store.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
-                .join(user).on(reservation.userId.eq(user.userId))
+                .leftJoin(store).on(store.userId.eq(storeOwner.userId))
+                .leftJoin(storeDetail).on(storeDetail.storeId.eq(store.storeId))
+                .leftJoin(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .leftJoin(customer).on(reservation.userId.eq(customer.userId))
                 .where(
                         store.storeId.eq(storeId),
                         store.userId.eq(userId),
@@ -342,7 +346,8 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                         set(new QReservationDto_ForPartner(
                                 reservation.reservationId,
                                 Projections.fields(AuthDto.ForResponse.class,
-                                        user.userId, user.username),
+                                        customer.userId.as("id"),
+                                        customer.username.as("name")),
                                 reservation.headCount, reservation.status)
                         ))
                 ));
@@ -357,7 +362,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         QReservation reservation = QReservation.reservation;
 
         return jpaQueryFactory
-                .select(reservation.headCount.sum())
+                .select(reservation.headCount.sum().coalesce(0))
                 .from(reservation)
                 .where(
                         reservation.storeDetailId.eq(storeDetailId),

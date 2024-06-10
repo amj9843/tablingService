@@ -61,18 +61,18 @@ public class ReviewDto {
     @Data
     @NoArgsConstructor
     public static class UserReviewInfo {
-        private LocalDateTime createAt;
-        private LocalDateTime updateAt;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
         private Long storeId;
         private Long reviewId;
         private int rate;
         private String context;
 
         @QueryProjection
-        public UserReviewInfo(LocalDateTime createAt, LocalDateTime updateAt,
-                          Long storeId, Long reviewId, int rate, String context) {
-            this.createAt = createAt;
-            this.updateAt = updateAt;
+        public UserReviewInfo(LocalDateTime createdAt, LocalDateTime updatedAt,
+                              Long storeId, Long reviewId, int rate, String context) {
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
             this.storeId = storeId;
             this.reviewId = reviewId;
             this.rate = rate;
@@ -84,17 +84,17 @@ public class ReviewDto {
     @Data
     @NoArgsConstructor
     public static class StoreReviewInfo {
-        private LocalDateTime createAt;
-        private LocalDateTime updateAt;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
         private Long reviewId;
         private int rate;
         private String context;
 
         @QueryProjection
-        public StoreReviewInfo(LocalDateTime createAt, LocalDateTime updateAt,
+        public StoreReviewInfo(LocalDateTime createdAt, LocalDateTime updatedAt,
                                Long reviewId, int rate, String context) {
-            this.createAt = createAt;
-            this.updateAt = updateAt;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
             this.reviewId = reviewId;
             this.rate = rate;
             this.context = context;
@@ -105,19 +105,19 @@ public class ReviewDto {
     @Data
     @NoArgsConstructor
     public static class ReviewDetail {
-        private LocalDateTime createAt;
-        private LocalDateTime updateAt;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
         private ReservationDto.ForResponse reservation;
         private AuthDto.ForResponse user;
         private int rate;
         private String context;
 
         @QueryProjection
-        public ReviewDetail(LocalDateTime createAt, LocalDateTime updateAt,
+        public ReviewDetail(LocalDateTime createdAt, LocalDateTime updatedAt,
                             ReservationDto.ForResponse reservation, AuthDto.ForResponse user,
                             int rate, String context) {
-            this.createAt = createAt;
-            this.updateAt = updateAt;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
             this.reservation = reservation;
             this.user = user;
             this.rate = rate;

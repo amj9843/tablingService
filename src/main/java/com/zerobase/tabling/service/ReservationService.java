@@ -16,7 +16,7 @@ public interface ReservationService {
     void modifyReservation(Long reservationId, Long userId, ReservationDto.ModifyRequest request);
 
     //예약 취소
-    void cancleReservation(Long reservationId, Long userId);
+    void cancelReservation(Long reservationId, Long userId);
 
     //사용자의 예약 내역 삭제
     void deleteReservation(Long reservationId, Long userId);

@@ -18,8 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
-
 @Repository
 @RequiredArgsConstructor
 public class CustomStoreDetailRepositoryImpl implements CustomStoreDetailRepository {
@@ -30,23 +28,33 @@ public class CustomStoreDetailRepositoryImpl implements CustomStoreDetailReposit
         QStoreDetail storeDetail = QStoreDetail.storeDetail;
         QReservation reservation = QReservation.reservation;
 
-        return Optional.ofNullable(jpaQueryFactory
+        StoreDetailDto.CustomStoreDetail detail = jpaQueryFactory
                 .select(Projections.fields(StoreDetailDto.CustomStoreDetail.class,
                         storeDetail.storeDetailId,
                         storeDetail.storeId,
                         storeDetail.reservationTime,
-                        storeDetail.headCount.add(reservation.headCount.sum().multiply(-1))))
+                        storeDetail.headCount))
                 .from(storeDetail)
-                .join(reservation)
-                .on(
-                        storeDetail.storeDetailId.eq(reservation.storeDetailId)
-                ).where(
-                        storeDetail.storeDetailId.eq(storeDetailId),
-                        reservation.status.eq(ReservationStatus.APPLIED)
-                                .or(reservation.status.eq(ReservationStatus.APPROVED))
+                .where(
+                        storeDetail.storeDetailId.eq(storeDetailId)
                 )
-                .groupBy(storeDetail.storeDetailId)
-                .fetchOne());
+                .fetchOne();
+
+        if (detail != null) {
+            Integer nowHeadCount = jpaQueryFactory
+                    .select(reservation.headCount.sum().coalesce(0))
+                    .from(reservation)
+                    .where(reservation.storeDetailId.eq(detail.getStoreDetailId()),
+                            reservation.status.eq(ReservationStatus.APPLIED).or(reservation.status.eq(ReservationStatus.APPROVED)))
+                    .groupBy(reservation.storeDetailId)
+                    .fetchFirst();
+
+            if (nowHeadCount == null) nowHeadCount = 0;
+
+            detail.setHeadCount(detail.getHeadCount() - nowHeadCount);
+        }
+
+        return Optional.ofNullable(detail);
     }
 
     @Override
@@ -57,7 +65,7 @@ public class CustomStoreDetailRepositoryImpl implements CustomStoreDetailReposit
         Integer fetchOne = jpaQueryFactory
                 .selectOne()
                 .from(storeDetail)
-                .join(store)
+                .leftJoin(store)
                 .on(
                         storeDetail.storeId.eq(store.storeId)
                 )
@@ -77,21 +85,34 @@ public class CustomStoreDetailRepositoryImpl implements CustomStoreDetailReposit
         QReservation reservation = QReservation.reservation;
         QStoreDetail storeDetail = QStoreDetail.storeDetail;
 
-        List<StoreDetailDto.Detail> details = jpaQueryFactory
+        List<StoreDetailDto.Detail> detailList = jpaQueryFactory
+                .select(Projections.fields(StoreDetailDto.Detail.class,
+                                storeDetail.storeDetailId, storeDetail.reservationTime,
+                                storeDetail.headCount.as("totalHeadCount")))
                 .from(storeDetail)
-                .join(store).on(store.storeId.eq(storeDetail.storeId))
-                .join(reservation).on(reservation.storeDetailId.eq(storeDetail.storeDetailId))
+                .leftJoin(store).on(store.storeId.eq(storeDetail.storeId))
                 .where(store.storeId.eq(storeId),
-                        storeDetail.reservationTime.after(now),
-                        reservation.status.eq(ReservationStatus.APPROVED)
-                                .or(reservation.status.eq(ReservationStatus.APPLIED)))
+                        storeDetail.reservationTime.after(now))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(storeDetail.reservationTime.asc())
-                .transform(groupBy(storeDetail.storeDetailId).list(Projections.fields(StoreDetailDto.Detail.class,
-                        storeDetail.storeDetailId, storeDetail.reservationTime, storeDetail.headCount, reservation.headCount.sum()
-                )));
+                .groupBy(storeDetail.storeDetailId)
+                .fetch();
 
-        return new PageImpl<>(details, pageable, details.size());
+        for (StoreDetailDto.Detail detail: detailList) {
+            Integer nowHeadCount = jpaQueryFactory
+                    .select(reservation.headCount.sum().coalesce(0))
+                    .from(reservation)
+                    .where(reservation.storeDetailId.eq(detail.getStoreDetailId()),
+                            reservation.status.eq(ReservationStatus.APPLIED).or(reservation.status.eq(ReservationStatus.APPROVED)))
+                    .groupBy(reservation.storeDetailId)
+                    .fetchFirst();
+
+            if (nowHeadCount == null) nowHeadCount = 0;
+
+            detail.setNowHeadCount(nowHeadCount);
+        }
+
+        return new PageImpl<>(detailList, pageable, detailList.size());
     }
 }

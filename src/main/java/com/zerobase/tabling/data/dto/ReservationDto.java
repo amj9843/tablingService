@@ -15,17 +15,15 @@ public class ReservationDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ApplyRequest {
-        @Min(value = 1, message = "매장 상세정보 식별번호 입력이 필요합니다.")
-        private Long storeDetailId;
         @Min(value = 1, message = "예약 인원수는 최소 1명입니다.")
         private int headCount;
 
-        public Reservation toEntity(Long userId){
+        public Reservation toEntity(Long userId, Long storeDetailId){
             return Reservation.builder()
                     .userId(userId)
-                    .storeDetailId(this.storeDetailId)
+                    .storeDetailId(storeDetailId)
                     .headCount(this.headCount)
-                    .status(ReservationStatus.APPROVED)
+                    .status(ReservationStatus.APPLIED)
                     .build();
         }
     }
@@ -160,12 +158,19 @@ public class ReservationDto {
     //유저의 예약시간별 예약 정보 응답 DTO
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     @EqualsAndHashCode(of = {"reservationId"})
     public static class ForUser {
         private Long reservationId;
         private StoreDto.ForResponse store;
         private int headCount;
         private ReservationStatus status;
+
+        @QueryProjection
+        public ForUser(Long reservationId, StoreDto.ForResponse store, int headCount, ReservationStatus status) {
+            this.reservationId = reservationId;
+            this.store = store;
+            this.headCount = headCount;
+            this.status = status;
+        }
     }
 }
