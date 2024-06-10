@@ -48,4 +48,7 @@ public interface CustomReservationRepository {
 
     //매장 상세 정보 관련해 예약한 총 인원 수
     int countHeadCountByStoreDetailId(Long storeDetailId);
+
+    //방문 날짜로부터 하루가 지났는데도 예약 상태가 신청, 승인인 예약의 식별번호 리스트
+    List<Long> findAllNoShowReservations();
 }

@@ -371,4 +371,24 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                 )
                 .fetchFirst();
     }
+
+    @Override
+    public List<Long> findAllNoShowReservations() {
+        QReservation reservation = QReservation.reservation;
+        QStoreDetail storeDetail = QStoreDetail.storeDetail;
+
+        return jpaQueryFactory
+                .select(reservation.reservationId)
+                .from(reservation)
+                .leftJoin(storeDetail).on(storeDetail.storeDetailId.eq(reservation.storeDetailId))
+                .where(
+                        storeDetail.reservationTime.before(
+                                LocalDateTime.of(
+                                        LocalDate.now().minusDays(1), LocalTime.of(0, 0))
+                        ),
+                        reservation.status.eq(ReservationStatus.APPLIED)
+                                .or(reservation.status.eq(ReservationStatus.APPROVED))
+                )
+                .fetch();
+    }
 }
