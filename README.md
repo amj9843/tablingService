@@ -1150,7 +1150,7 @@
   <details>
   <summary>상세 리뷰 조회 API</summary>
 
-    - PATCH ```/{reviewId}/detail```
+    - PATCH ```/detail/{reviewId}```
     - 리뷰 상세내역 확인
     - 출력 결과
       ```json
