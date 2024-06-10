@@ -1,4 +1,6 @@
 # 매장 테이블 예약 서비스 API
+## ERD
+![ERD](https://github.com/amj9843/tablingService/assets/71617201/e6e551e7-cc4f-4d22-aa2f-77b7d8d7997a)
 
 ## Development Environment
 - Intellij IDEA Community
